@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Meherpur Internet | Smart Control Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <style>
+    body, .content-wrapper, .main-header, .main-footer, .btn, input, select, textarea, .nav-link {
+      font-family: 'Hind Siliguri', sans-serif !important;
+    }
+    .small-box { border-radius: 12px; overflow: hidden; }
+    .small-box .icon > i { font-size: 50px; top: 15px; }
+    .card { border-radius: 12px; }
+    .table td, .table th { vertical-align: middle !important; padding: 10px 8px; }
+    .custom-chk { width: 20px; height: 20px; cursor: pointer; accent-color: #28a745; }
+    .badge-day-0 { background-color: #dc3545; color: #fff; }
+    .badge-day-1 { background-color: #fd7e14; color: #fff; }
+    .badge-day-2 { background-color: #ffc107; color: #1f2d3d; }
+    .badge-day-3 { background-color: #17a2b8; color: #fff; }
+    .row-selected { background-color: rgba(40, 167, 69, 0.14) !important; }
+    .nav-tabs .nav-link { font-weight: 600; font-size: 15px; padding: 10px 16px; }
+    .nav-tabs .nav-link.active { border-top: 3px solid #00bc8c !important; }
+    .pulse-red { animation: pulseRed 1.5s infinite; cursor: pointer; }
+    @keyframes pulseRed {
+      0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+    #copyToast {
+      position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+      background: #00bc8c; color: #fff; padding: 10px 18px;
+      border-radius: 8px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      display: none;
+    }
+    #pinOverlay {
+      position: fixed; inset: 0; z-index: 10000;
+      background: #0f172a; display: flex; align-items: center; justify-content: center;
+    }
+    @media (max-width: 576px) {
+      .small-box h3 { font-size: 24px; }
+      .small-box p { font-size: 12px; }
+      .small-box .icon > i { font-size: 36px; }
+      .nav-tabs .nav-link { font-size: 13px; padding: 8px 10px; }
+      .btn-group-mobile { display: flex; flex-wrap: wrap; gap: 5px; }
+      .btn-group-mobile .btn { flex: 1 1 45%; font-size: 12px; }
+    }
+  </style>
+</head>
+<body class="hold-transition layout-top-nav dark-mode">
+
+<!-- PIN Lock Screen (বাইরের কেউ যেন ঢুকতে না পারে) -->
+<div id="pinOverlay">
+  <div class="card card-outline card-primary shadow-lg" style="width: 340px;">
+    <div class="card-header text-center">
+      <h4 class="font-weight-bold mb-0"><i class="fas fa-wifi text-info mr-1"></i> Meherpur Internet</h4>
+      <small class="text-muted">সিকিউরিটি পিন দিয়ে প্রবেশ করুন</small>
+    </div>
+    <div class="card-body">
+      <input type="password" id="pinInput" class="form-control form-control-lg text-center mb-3" placeholder="পিন নাম্বার দিন (1234)" onkeypress="if(event.key==='Enter') verifyPin()">
+      <button onclick="verifyPin()" class="btn btn-primary btn-block font-weight-bold">প্রবেশ করুন</button>
+      <p id="pinErr" class="text-danger text-center text-xs mt-2 d-none">ভুল পিন নাম্বার!</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrapper">
+  <div id="copyToast"><i class="fas fa-check-circle mr-1"></i> কপি করা হয়েছে!</div>
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand-md navbar-dark bg-navy border-bottom-0 shadow">
+    <div class="container">
+      <a href="#" class="navbar-brand">
+        <i class="fas fa-wifi text-info mr-1"></i>
+        <span class="brand-text font-weight-bold">Meherpur Internet</span>
+      </a>
+      <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto align-items-center">
+        <li class="nav-item mr-2">
+          <span id="waStatusBadge" onclick="handleStatusClick()" class="badge badge-danger pulse-red px-3 py-2" style="font-size: 13px;">
+            <i class="fas fa-spinner fa-spin mr-1"></i> সার্ভার চেক হচ্ছে...
+          </span>
+        </li>
+        <li class="nav-item">
+          <button onclick="document.body.classList.toggle('dark-mode')" class="btn btn-sm btn-outline-light" title="Dark/Light Mode">
+            <i class="fas fa-adjust"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Content Wrapper -->
+  <div class="content-wrapper">
+    <div class="content-header pb-1">
+      <div class="container">
+        <!-- Offline Warning Banner -->
+        <div id="offlineAlert" onclick="showOfflineModal()" style="cursor:pointer;" class="alert alert-danger shadow-sm d-none mb-3">
+          <h6 class="font-weight-bold mb-1"><i class="fas fa-exclamation-triangle mr-1"></i> হোয়াটসঅ্যাপ সার্ভার বর্তমানে কানেক্টেড নেই!</h6>
+          <p class="mb-0 text-sm">অনুগ্রহ করে আপনার স্টাফকে ফোন দিয়ে <b>সার্ভার চালু (Termux -> bot)</b> করতে বলুন। সার্ভার চালু করলেই এই পেজটি অটোমেটিক কানেক্ট হয়ে যাবে।</p>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+          <div class="col-sm-8">
+            <h1 class="m-0 text-md font-weight-bold">
+              <i class="fab fa-whatsapp text-success mr-1"></i> অটোমেটিক বিল রিমাইন্ডার প্যানেল (৩ দিন, আগামীকাল ও আজ)
+            </h1>
+          </div>
+          <div class="col-sm-4 text-sm-right mt-1 mt-sm-0">
+            <span class="text-muted text-xs" id="lastScanTimeTxt">সর্বশেষ স্ক্যান: এখনো করা হয়নি</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+      <div class="container">
+
+        <!-- Summary Info Boxes -->
+        <div class="row">
+          <div class="col-6 col-md-3">
+            <div class="small-box bg-info shadow-sm">
+              <div class="inner"><h3 id="statTotal">0</h3><p>মোট গ্রাহক (০-৩ দিন)</p></div>
+              <div class="icon"><i class="fas fa-users"></i></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="small-box bg-success shadow-sm">
+              <div class="inner"><h3 id="statWaYes">0</h3><p>WhatsApp খোলা আছে</p></div>
+              <div class="icon"><i class="fab fa-whatsapp"></i></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="small-box bg-danger shadow-sm">
+              <div class="inner"><h3 id="statWaNo">0</h3><p>WhatsApp খোলা নেই</p></div>
+              <div class="icon"><i class="fas fa-phone-slash"></i></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="small-box bg-warning shadow-sm">
+              <div class="inner"><h3 id="statToday">0</h3><p>আজ ও কাল মেয়াদ শেষ</p></div>
+              <div class="icon"><i class="fas fa-bell"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 1: Scan Card -->
+        <div class="card card-primary card-outline shadow-sm">
+          <div class="card-header">
+            <h3 class="card-title font-weight-bold">
+              <i class="fas fa-search-plus mr-1 text-primary"></i> ১. গ্রাহক স্ক্যান করুন
+            </h3>
+            <div class="card-tools">
+              <button onclick="startScan(true)" class="btn btn-tool text-warning text-xs" title="সব ক্যাশ রিসেট করে নতুন করে স্ক্যান করুন">
+                <i class="fas fa-sync-alt mr-1"></i> ফুল ক্যাশ রিসেট
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-8 mb-3 mb-md-0">
+                <p class="mb-0 text-sm text-muted">
+                  স্মার্ট ক্যাশ চালু আছে। ক্লিক করলেই <b>আগামী ৩ দিন পর, ২ দিন পর, আগামীকাল এবং আজ</b> যাদের মেয়াদ শেষ হবে তাদের খুঁজে বের করবে এবং অটোমেটিক সিলেক্ট করে নেবে।
+                </p>
+              </div>
+              <div class="col-md-4">
+                <button id="scanBtn" onclick="startScan(false)" class="btn btn-primary btn-lg btn-block font-weight-bold shadow">
+                  <i class="fas fa-bolt mr-1"></i> প্রথমে স্ক্যান করুন
+                </button>
+              </div>
+            </div>
+
+            <!-- Scan Progress Bar -->
+            <div id="scanProgressWrap" class="mt-3 d-none">
+              <div class="d-flex justify-content-between text-xs mb-1">
+                <span id="scanStatusText" class="text-info font-weight-bold">স্ক্যান শুরু হচ্ছে...</span>
+                <span id="scanPercentText" class="badge badge-info">0%</span>
+              </div>
+              <div class="progress progress-sm active" style="height: 10px; border-radius: 6px;">
+                <div id="scanBar" class="progress-bar bg-info progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Action & Send Panel -->
+        <div id="actionSection" class="d-none">
+          <div class="card card-success card-outline shadow-sm">
+            <div class="card-header">
+              <h3 class="card-title font-weight-bold">
+                <i class="fas fa-paper-plane mr-1 text-success"></i> ২. কুইক সিলেকশন ও মেসেজ প্রেরণ
+              </h3>
+            </div>
+            <div class="card-body">
+              <label class="d-block text-xs text-muted mb-2">এক ক্লিকে দিন অনুযায়ী সিলেক্ট করুন (যাদের WhatsApp আছে):</label>
+              <div class="btn-group-mobile mb-3">
+                <button type="button" onclick="applySelection('all_3')" class="btn btn-sm btn-info font-weight-bold mr-1 mb-1">
+                  <i class="fas fa-check-double mr-1"></i> সব সিলেক্ট (আজ, কাল, ২ ও ৩ দিন)
+                </button>
+                <button type="button" onclick="applySelection('today')" class="btn btn-sm btn-danger mr-1 mb-1">
+                  আজ মেয়াদ শেষ (<span id="cntDay0">0</span>)
+                </button>
+                <button type="button" onclick="applySelection('tomorrow')" class="btn btn-sm btn-warning mr-1 mb-1">
+                  আগামীকাল (<span id="cntDay1">0</span>)
+                </button>
+                <button type="button" onclick="applySelection('day2')" class="btn btn-sm btn-primary mr-1 mb-1">
+                  ২ দিন পর (<span id="cntDay2">0</span>)
+                </button>
+                <button type="button" onclick="applySelection('day3')" class="btn btn-sm btn-secondary mr-1 mb-1">
+                  ৩ দিন পর (<span id="cntDay3">0</span>)
+                </button>
+                <button type="button" onclick="applySelection('none')" class="btn btn-sm btn-outline-light mb-1">
+                  <i class="fas fa-times mr-1"></i> আনসিলেক্ট
+                </button>
+              </div>
+
+              <div class="row align-items-center pt-2 border-top border-secondary">
+                <div class="col-md-5 mb-2 mb-md-0">
+                  <span class="text-sm">
+                    সিলেক্টেড গ্রাহক: <strong id="selectedCountBadge" class="badge badge-success px-2 py-1" style="font-size:14px;">0</strong> জন
+                  </span>
+                </div>
+                <div class="col-md-7">
+                  <button id="sendBtn" onclick="startSendSelected()" class="btn btn-success btn-lg btn-block font-weight-bold shadow">
+                    <i class="fab fa-whatsapp mr-1"></i> নির্বাচিতদের মেসেজ পাঠান (<span id="sendBtnCount">0</span> জন)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Send Progress Bar -->
+              <div id="sendProgressWrap" class="mt-3 d-none">
+                <div class="d-flex justify-content-between text-xs mb-1">
+                  <span id="sendStatusText" class="text-success font-weight-bold">মেসেজ পাঠানো হচ্ছে...</span>
+                  <span id="sendPercentText" class="badge badge-success">0%</span>
+                </div>
+                <div class="progress progress-sm active" style="height: 10px; border-radius: 6px;">
+                  <div id="sendBar" class="progress-bar bg-success progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Collapsible Customer List with 2 Separate Tabs -->
+          <div id="customerCard" class="card card-info card-outline card-tabs collapsed-card shadow-sm">
+            <div class="card-header p-0 pt-1 border-bottom-0">
+              <div class="d-flex justify-content-between align-items-center px-3 py-2" style="cursor: pointer;" data-card-widget="collapse">
+                <h3 class="card-title font-weight-bold text-sm">
+                  <i class="fas fa-users-cog mr-1 text-info"></i> ৩. গ্রাহকদের তালিকা দেখুন (ক্লিক করে খুলুন / বন্ধ করুন)
+                </h3>
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Two Separate Tabs -->
+              <ul class="nav nav-tabs px-2" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active text-success" data-toggle="pill" href="#tab-wa-yes" role="tab">
+                    <i class="fab fa-whatsapp mr-1"></i> WhatsApp খোলা আছে (<span id="tabYesBadge">0</span>)
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-danger" data-toggle="pill" href="#tab-wa-no" role="tab">
+                    <i class="fas fa-phone-slash mr-1"></i> WhatsApp খোলা নেই (<span id="tabNoBadge">0</span>)
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="card-body p-0" style="display: none;">
+              <div class="p-3 bg-dark border-bottom border-secondary">
+                <div class="row">
+                  <div class="col-md-7 mb-2 mb-md-0">
+                    <input type="text" id="searchInput" oninput="renderBothTabs()" class="form-control form-control-sm" placeholder="নাম, আইডি (MHPI) বা ফোন নাম্বার দিয়ে খুঁজুন...">
+                  </div>
+                  <div class="col-md-5">
+                    <select id="dayFilterSelect" onchange="renderBothTabs()" class="form-control form-control-sm">
+                      <option value="all">সকল দিন দেখান (আজ, আগামীকাল, ২ ও ৩ দিন)</option>
+                      <option value="0">শুধুমাত্র আজ (০ দিন)</option>
+                      <option value="1">আগামীকাল (১ দিন)</option>
+                      <option value="2">২ দিন পর</option>
+                      <option value="3">৩ দিন পর</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-content">
+                <!-- TAB 1: WhatsApp Available -->
+                <div class="tab-pane fade show active" id="tab-wa-yes" role="tabpanel">
+                  <div class="table-responsive" style="max-height: 480px;">
+                    <table class="table table-hover table-striped mb-0 text-sm">
+                      <thead class="bg-navy">
+                        <tr>
+                          <th style="width: 42px;" class="text-center">
+                            <input type="checkbox" onchange="toggleVisibleCheckboxes(this.checked)" class="custom-chk">
+                          </th>
+                          <th>গ্রাহকের নাম ও আইডি</th>
+                          <th>ফোন নাম্বার</th>
+                          <th>মেয়াদ ও দিন</th>
+                          <th class="text-center">অ্যাকশন</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tableWaYesBody"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- TAB 2: WhatsApp NOT Available -->
+                <div class="tab-pane fade" id="tab-wa-no" role="tabpanel">
+                  <div class="p-3 bg-secondary/20 border-bottom border-secondary d-flex flex-wrap justify-content-between align-items-center">
+                    <span class="text-xs text-warning">
+                      <i class="fas fa-info-circle mr-1"></i> এই গ্রাহকদের নাম্বারে WhatsApp নেই। নাম্বার কপি করে সাধারণ SMS পাঠাতে পারবেন:
+                    </span>
+                    <div class="mt-2 mt-sm-0">
+                      <button onclick="copyAllNoWaNumbers(false)" class="btn btn-xs btn-danger font-weight-bold mr-1">
+                        <i class="fas fa-copy mr-1"></i> শুধু সব নাম্বার কপি করুন
+                      </button>
+                      <button onclick="copyAllNoWaNumbers(true)" class="btn btn-xs btn-outline-light">
+                        <i class="fas fa-list mr-1"></i> নাম ও আইডিসহ কপি করুন
+                      </button>
+                    </div>
+                  </div>
+                  <div class="table-responsive" style="max-height: 480px;">
+                    <table class="table table-hover table-striped mb-0 text-sm">
+                      <thead class="bg-danger">
+                        <tr>
+                          <th>গ্রাহকের নাম ও আইডি</th>
+                          <th>ফোন নাম্বার</th>
+                          <th>মেয়াদ ও দিন</th>
+                          <th class="text-center">কপি / SMS / কল</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tableWaNoBody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Offline Alert Modal (যখন সার্ভার বন্ধ থাকবে) -->
+  <div class="modal fade" id="offlineModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-danger">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title font-weight-bold"><i class="fas fa-power-off mr-1"></i> সার্ভার কানেক্টেড নেই!</h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <i class="fas fa-headset fa-4x text-danger mb-3"></i>
+          <h5 class="font-weight-bold">অনুগ্রহ করে আপনার স্টাফকে সার্ভার চালু করতে বলুন!</h5>
+          <p class="text-sm text-muted mt-2 mb-0">
+            স্টাফ তার ফোনে <b>Termux</b> ওপেন করে <code>bot</code> লিখে এন্টার দিলেই এই পেজটি অটোমেটিক কানেক্ট হয়ে যাবে।
+          </p>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-danger px-4 font-weight-bold" data-dismiss="modal">ঠিক আছে</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Preview Modal -->
+  <div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-info py-2">
+          <h6 class="modal-title font-weight-bold"><i class="fas fa-envelope-open-text mr-1"></i> মেসেজ প্রিভিউ ও এডিট</h6>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2 text-xs">
+            <strong>গ্রাহক:</strong> <span id="modalUserName"></span> | <strong>ফোন:</strong> <span id="modalUserPhone"></span>
+          </div>
+          <textarea id="modalMessageText" rows="8" class="form-control text-sm"></textarea>
+        </div>
+        <div class="modal-footer justify-content-between py-2">
+          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">বন্ধ করুন</button>
+          <div>
+            <button type="button" onclick="saveCustomMsg()" class="btn btn-info btn-sm mr-1"><i class="fas fa-save mr-1"></i> সেভ</button>
+            <button type="button" id="modalSingleSendBtn" onclick="sendSingleFromModal()" class="btn btn-success btn-sm font-weight-bold"><i class="fab fa-whatsapp mr-1"></i> পাঠান</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="main-footer text-xs text-center py-2">
+    <strong>Meherpur Internet</strong> — Smart ISP Automation Panel
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+<script>
+// ============ কনফিগারেশন ============
+const ACCESS_PIN = "1234"; // চাইলে এই পিন পরিবর্তন করতে পারেন
+const SYNC_CHANNEL = "mhpi_isp_tunnel_sync_8842";
+// ===================================
+
+let API_BASE = "";
+let serverOnline = false;
+let waConnected = false;
+let allResults = [];
+let selectedIds = new Set();
+let customMessages = {};
+let activeModalId = null;
+let autoSelectedOnFinish = false;
+let wasScanning = false;
+
+// পিন চেক করা
+if (localStorage.getItem("mhpi_pin_ok") === ACCESS_PIN) {
+  document.getElementById("pinOverlay").style.display = "none";
+}
+function verifyPin() {
+  const val = document.getElementById("pinInput").value.trim();
+  if (val === ACCESS_PIN) {
+    localStorage.setItem("mhpi_pin_ok", ACCESS_PIN);
+    document.getElementById("pinOverlay").style.display = "none";
+  } else {
+    document.getElementById("pinErr").classList.remove("d-none");
+  }
+}
+
+function showOfflineModal() { $('#offlineModal').modal('show'); }
+function handleStatusClick() { if (!serverOnline || !waConnected) showOfflineModal(); }
+
+function showToast(msg) {
+  const t = document.getElementById('copyToast');
+  t.innerHTML = '<i class="fas fa-check-circle mr-1"></i> ' + msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 2200);
+}
+
+function copyTextToClipboard(text, label) {
+  const temp = document.createElement('textarea');
+  temp.value = text;
+  document.body.appendChild(temp);
+  temp.select();
+  document.execCommand('copy');
+  document.body.removeChild(temp);
+  showToast(label || 'কপি করা হয়েছে!');
+}
+
+function getDayBadgeClass(d) {
+  if (d === 0) return 'badge-day-0';
+  if (d === 1) return 'badge-day-1';
+  if (d === 2) return 'badge-day-2';
+  return 'badge-day-3';
+}
+
+function applySelection(mode) {
+  selectedIds.clear();
+  allResults.forEach(u => {
+    if (!u.has_wa || u.sent || u.after_4pm) return;
+    if (mode === 'all_3' && u.days_left >= 0 && u.days_left <= 3) selectedIds.add(u.idname);
+    else if (mode === 'today' && u.days_left === 0) selectedIds.add(u.idname);
+    else if (mode === 'tomorrow' && u.days_left === 1) selectedIds.add(u.idname);
+    else if (mode === 'day2' && u.days_left === 2) selectedIds.add(u.idname);
+    else if (mode === 'day3' && u.days_left === 3) selectedIds.add(u.idname);
+  });
+  renderBothTabs();
+  updateSelectedCounter();
+}
+
+function toggleSingleUser(idname, checked) {
+  if (checked) selectedIds.add(idname);
+  else selectedIds.delete(idname);
+  updateSelectedCounter();
+  const row = document.getElementById('row_' + idname);
+  if (row) row.classList.toggle('row-selected', checked);
+}
+
+function toggleVisibleCheckboxes(checked) {
+  getFilteredUsers(true).forEach(u => {
+    if (checked) selectedIds.add(u.idname);
+    else selectedIds.delete(u.idname);
+  });
+  renderBothTabs();
+  updateSelectedCounter();
+}
+
+function updateSelectedCounter() {
+  const count = selectedIds.size;
+  document.getElementById('selectedCountBadge').innerText = count;
+  document.getElementById('sendBtnCount').innerText = count;
+  document.getElementById('sendBtn').disabled = (count === 0);
+}
+
+function getFilteredUsers(waState) {
+  const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  const dayFilter = document.getElementById('dayFilterSelect').value;
+  return allResults.filter(u => {
+    if (u.has_wa !== waState) return false;
+    if (q && !(u.name.toLowerCase().includes(q) || u.idname.toLowerCase().includes(q) || u.local_phone.includes(q))) return false;
+    if (dayFilter !== 'all' && u.days_left !== parseInt(dayFilter)) return false;
+    return true;
+  });
+}
+
+function renderBothTabs() {
+  const yesList = getFilteredUsers(true);
+  const tbodyYes = document.getElementById('tableWaYesBody');
+  tbodyYes.innerHTML = yesList.length === 0
+    ? '<tr><td colspan="5" class="text-center py-4 text-muted">কোনো গ্রাহক পাওয়া যায়নি</td></tr>'
+    : yesList.map(u => {
+        const isChecked = selectedIds.has(u.idname);
+        const sentBadge = u.sent ? '<span class="badge badge-primary ml-1">আজ পাঠানো হয়েছে</span>' : '';
+        return `
+          <tr id="row_${u.idname}" class="${isChecked ? 'row-selected' : ''}">
+            <td class="text-center">
+              <input type="checkbox" class="custom-chk" ${isChecked ? 'checked' : ''} onchange="toggleSingleUser('${u.idname}', this.checked)">
+            </td>
+            <td>
+              <div class="font-weight-bold">${u.name}</div>
+              <small class="text-info">${u.idname}</small> ${sentBadge}
+            </td>
+            <td>
+              <span class="font-weight-bold">${u.local_phone}</span>
+              <button onclick="copyTextToClipboard('${u.local_phone}', '${u.local_phone} কপি হয়েছে!')" class="btn btn-xs btn-link text-info p-0 ml-1"><i class="fas fa-copy"></i></button>
+            </td>
+            <td>
+              <span class="badge ${getDayBadgeClass(u.days_left)} px-2 py-1">${u.day_label}</span>
+              <div class="text-xs text-muted mt-1">${u.expire_date}</div>
+            </td>
+            <td class="text-center">
+              <button onclick="openPreviewModal('${u.idname}')" class="btn btn-xs btn-outline-info"><i class="fas fa-eye mr-1"></i> মেসেজ</button>
+            </td>
+          </tr>`;
+      }).join('');
+
+  const noList = getFilteredUsers(false);
+  const tbodyNo = document.getElementById('tableWaNoBody');
+  tbodyNo.innerHTML = noList.length === 0
+    ? '<tr><td colspan="4" class="text-center py-4 text-muted">WhatsApp বিহীন কোনো গ্রাহক নেই</td></tr>'
+    : noList.map(u => {
+        const smsBody = encodeURIComponent(customMessages[u.idname] || u.message);
+        return `
+          <tr>
+            <td><div class="font-weight-bold">${u.name}</div><small class="text-warning">${u.idname}</small></td>
+            <td><span class="font-weight-bold text-danger">${u.local_phone}</span></td>
+            <td>
+              <span class="badge ${getDayBadgeClass(u.days_left)} px-2 py-1">${u.day_label}</span>
+              <div class="text-xs text-muted mt-1">${u.expire_date}</div>
+            </td>
+            <td class="text-center">
+              <div class="btn-group">
+                <button onclick="copyTextToClipboard('${u.local_phone}', '${u.local_phone} কপি হয়েছে!')" class="btn btn-xs btn-info"><i class="fas fa-copy mr-1"></i> কপি</button>
+                <a href="sms:${u.local_phone}?body=${smsBody}" class="btn btn-xs btn-warning"><i class="fas fa-comment-sms mr-1"></i> SMS</a>
+                <a href="tel:${u.local_phone}" class="btn btn-xs btn-success"><i class="fas fa-phone"></i></a>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+}
+
+function copyAllNoWaNumbers(withDetails) {
+  const noList = getFilteredUsers(false);
+  if (noList.length === 0) return showToast('কোনো নাম্বার নেই!');
+  const text = withDetails
+    ? noList.map(u => `${u.name} (${u.idname}) - ${u.local_phone} [${u.day_label}]`).join('\n')
+    : noList.map(u => u.local_phone).join('\n');
+  copyTextToClipboard(text, `${noList.length} টি নাম্বার কপি হয়েছে!`);
+}
+
+function openPreviewModal(idname) {
+  const user = allResults.find(x => x.idname === idname);
+  if (!user) return;
+  activeModalId = idname;
+  document.getElementById('modalUserName').innerText = `${user.name} (${user.idname})`;
+  document.getElementById('modalUserPhone').innerText = user.local_phone;
+  document.getElementById('modalMessageText').value = customMessages[idname] || user.message;
+  $('#previewModal').modal('show');
+}
+
+function saveCustomMsg() {
+  if (!activeModalId) return;
+  customMessages[activeModalId] = document.getElementById('modalMessageText').value;
+  $('#previewModal').modal('hide');
+  showToast('মেসেজ সেভ হয়েছে!');
+}
+
+async function sendSingleFromModal() {
+  if (!serverOnline || !waConnected) return showOfflineModal();
+  customMessages[activeModalId] = document.getElementById('modalMessageText').value;
+  $('#previewModal').modal('hide');
+  document.getElementById('sendProgressWrap').classList.remove('d-none');
+  await fetch(API_BASE + '/api/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids: [activeModalId], custom_messages: customMessages })
+  });
+}
+
+async function startScan(force) {
+  if (!serverOnline || !waConnected) return showOfflineModal();
+  autoSelectedOnFinish = false;
+  wasScanning = true;
+  document.getElementById('scanProgressWrap').classList.remove('d-none');
+  document.getElementById('scanBtn').disabled = true;
+  await fetch(API_BASE + '/api/scan?force=' + (force ? '1' : '0'), { method: 'POST' });
+}
+
+async function startSendSelected() {
+  if (!serverOnline || !waConnected) return showOfflineModal();
+  const ids = Array.from(selectedIds);
+  if (ids.length === 0) return;
+  document.getElementById('sendProgressWrap').classList.remove('d-none');
+  document.getElementById('sendBtn').disabled = true;
+  await fetch(API_BASE + '/api/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids: ids, custom_messages: customMessages })
+  });
+}
+
+// Termux থেকে পাঠানো সর্বশেষ লাইভ টানেল লিংক অটোমেটিক খুঁজে বের করা
+async function syncTunnelUrl() {
+  try {
+    const res = await fetch(`https://ntfy.sh/${SYNC_CHANNEL}/json?poll=1&since=48h`);
+    const text = await res.text();
+    const lines = text.trim().split('\n').filter(Boolean);
+    for (let i = lines.length - 1; i >= 0; i--) {
+      const obj = JSON.parse(lines[i]);
+      if (obj.event === 'message' && typeof obj.message === 'string') {
+        if (obj.message === 'OFFLINE') {
+          API_BASE = "";
+        } else if (obj.message.startsWith('https://')) {
+          API_BASE = obj.message.trim().replace(/\/$/, '');
+        }
+        break;
+      }
+    }
+  } catch (e) {}
+}
+
+async function pollState() {
+  if (!API_BASE) {
+    setOfflineUI();
+    return;
+  }
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(API_BASE + '/api/state', { signal: controller.signal });
+    clearTimeout(timer);
+    const data = await res.json();
+
+    serverOnline = true;
+    waConnected = !!data.wa_connected;
+
+    const badge = document.getElementById('waStatusBadge');
+    const alertBox = document.getElementById('offlineAlert');
+
+    if (waConnected) {
+      badge.className = "badge badge-success px-3 py-2";
+      badge.innerHTML = '<i class="fab fa-whatsapp mr-1"></i> কানেক্টেড (সার্ভার সচল)';
+      alertBox.classList.add('d-none');
+    } else {
+      badge.className = "badge badge-warning pulse-red px-3 py-2";
+      badge.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> WhatsApp কানেক্টেড নেই (ক্লিক করুন)';
+      alertBox.classList.remove('d-none');
+    }
+
+    if (data.last_scan_time) {
+      document.getElementById('lastScanTimeTxt').innerText = 'সর্বশেষ স্ক্যান: ' + data.last_scan_time;
+    }
+
+    if (data.scanning || data.scan_total > 0) {
+      document.getElementById('scanProgressWrap').classList.remove('d-none');
+      const pct = data.scan_total > 0 ? Math.round((data.scan_progress / data.scan_total) * 100) : 0;
+      document.getElementById('scanBar').style.width = pct + '%';
+      document.getElementById('scanPercentText').innerText = pct + '%';
+      document.getElementById('scanStatusText').innerText = data.scan_status;
+    }
+    if (!data.scanning) document.getElementById('scanBtn').disabled = false;
+
+    if (data.results && !data.scanning) {
+      const prevLen = allResults.length;
+      allResults = data.results;
+      const total = allResults.length;
+      const waYes = allResults.filter(u => u.has_wa).length;
+      const waNo = total - waYes;
+
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statWaYes').innerText = waYes;
+      document.getElementById('statWaNo').innerText = waNo;
+      document.getElementById('statToday').innerText = allResults.filter(u => u.days_left <= 1).length;
+      document.getElementById('tabYesBadge').innerText = waYes;
+      document.getElementById('tabNoBadge').innerText = waNo;
+
+      document.getElementById('cntDay0').innerText = allResults.filter(u => u.has_wa && u.days_left === 0).length;
+      document.getElementById('cntDay1').innerText = allResults.filter(u => u.has_wa && u.days_left === 1).length;
+      document.getElementById('cntDay2').innerText = allResults.filter(u => u.has_wa && u.days_left === 2).length;
+      document.getElementById('cntDay3').innerText = allResults.filter(u => u.has_wa && u.days_left === 3).length;
+
+      if (total > 0) {
+        document.getElementById('actionSection').classList.remove('d-none');
+        if ((wasScanning || prevLen === 0) && !autoSelectedOnFinish) {
+          autoSelectedOnFinish = true;
+          wasScanning = false;
+          applySelection('all_3');
+        } else {
+          allResults.forEach(u => { if (u.sent) selectedIds.delete(u.idname); });
+          renderBothTabs();
+          updateSelectedCounter();
+        }
+      }
+    }
+
+    if (data.sending || data.send_total > 0) {
+      document.getElementById('sendProgressWrap').classList.remove('d-none');
+      const spct = data.send_total > 0 ? Math.round((data.send_progress / data.send_total) * 100) : 0;
+      document.getElementById('sendBar').style.width = spct + '%';
+      document.getElementById('sendPercentText').innerText = spct + '%';
+      document.getElementById('sendStatusText').innerText = data.send_status;
+    }
+    if (!data.sending) updateSelectedCounter();
+
+  } catch (e) {
+    setOfflineUI();
+  }
+}
+
+function setOfflineUI() {
+  serverOnline = false;
+  waConnected = false;
+  const badge = document.getElementById('waStatusBadge');
+  badge.className = "badge badge-danger pulse-red px-3 py-2";
+  badge.innerHTML = '<i class="fas fa-power-off mr-1"></i> কানেক্টেড নেই (এখানে ক্লিক করুন)';
+  document.getElementById('offlineAlert').classList.remove('d-none');
+}
+
+syncTunnelUrl().then(pollState);
+setInterval(syncTunnelUrl, 4000);
+setInterval(pollState, 1500);
+</script>
+</body>
+</html>
