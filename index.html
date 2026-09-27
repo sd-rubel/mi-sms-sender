@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vision Exclusive Showroom — Meherpur Internet</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --brand:#00b69b;--brand-d:#009680;--brand-l:#e0f8f4;
+  --top-bg:#2b3945;--sub-hdr:#354656;
+  --bg:#f0f3f7;--card:#ffffff;
+  --heading:#4b5563;--text:#334155;--muted:#64748b;
+  --border:#e2e8f0;--border-2:#f1f5f9;
+  
+  /* Stat Card Colors matching screenshot */
+  --c-cyan:#06b6d4;
+  --c-green:#10b981;
+  --c-red:#f43f5e;
+  --c-blue:#0284c7;
+  --c-orange:#f59e0b;
+  --c-grey:#64748b;
+  
+  --sb-w:230px;
+}
+
+html,body{height:100%;margin:0;padding:0}
+body{
+  font-family:'Inter','Hind Siliguri',system-ui,-apple-system,sans-serif;
+  font-size:13px;line-height:1.45;color:var(--text);background:var(--bg);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  display:flex;flex-direction:column;
+}
+button,input,select,textarea{font-family:inherit}
+a{color:inherit;text-decoration:none}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+
+/* ================= TOPBAR (Like Screenshot) ================= */
+.top-navbar{
+  height:52px;background:var(--top-bg);color:#d1d5db;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;border-bottom:1px solid rgba(255,255,255,.08);
+  position:sticky;top:0;z-index:200;flex:none;
+}
+.tn-left{display:flex;align-items:center;gap:12px}
+.tn-logo{
+  width:32px;height:32px;border-radius:8px;background:rgba(0,182,155,.2);
+  border:1px solid var(--brand);color:var(--brand);
+  display:grid;place-items:center;font-size:14px;
+}
+.tn-brand b{display:block;font-size:14px;color:#e2e8f0;font-weight:700;letter-spacing:-.2px}
+.tn-brand small{display:block;font-size:10.5px;color:#94a3b8}
+
+.tn-right{display:flex;align-items:center;gap:8px}
+.tn-btn{
+  width:32px;height:32px;border-radius:7px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);color:#cbd5e1;display:grid;place-items:center;
+  cursor:pointer;font-size:12px;transition:.15s;
+}
+.tn-btn:hover{background:rgba(255,255,255,.12);color:#fff}
+.tn-btn.online{color:#22c55e;border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.12)}
+.tn-btn.warn{color:#f59e0b;border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.12)}
+.tn-btn.offline{color:#f43f5e;border-color:rgba(244,63,94,.4);background:rgba(244,63,94,.12)}
+
+/* ================= TWO-SECTION SPLIT WORKSPACE ================= */
+.workspace{
+  display:grid;
+  grid-template-columns:var(--sb-w) minmax(0,1fr);
+  flex:1;
+  min-height:calc(100vh - 52px);
+}
+
+/* ================= LEFT PANEL (Always Visible Split Section) ================= */
+.left-panel{
+  background:#ffffff;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;
+}
+.lp-header{
+  background:var(--sub-hdr);padding:12px 14px;color:#cbd5e1;
+  display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);
+}
+.lp-header-ico{
+  width:30px;height:30px;border-radius:7px;background:var(--brand);color:#fff;
+  display:grid;place-items:center;font-size:13px;flex:none;
+}
+.lp-header-txt b{display:block;font-size:12.5px;color:#e2e8f0}
+.lp-header-txt small{display:block;font-size:10px;color:#94a3b8}
+
+.lp-scan-box{padding:10px 12px;border-bottom:1px solid var(--border-2);background:#f8fafc}
+.scan-btn{
+  width:100%;padding:8px 10px;border-radius:7px;border:none;
+  background:linear-gradient(135deg,var(--brand),var(--brand-d));
+  color:#fff;font-weight:700;font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  box-shadow:0 4px 10px -4px rgba(0,182,155,.6);transition:.15s;
+}
+.scan-btn:hover{filter:brightness(1.05)}
+.scan-btn:disabled{opacity:.55;cursor:not-allowed}
+.scan-prog{display:none;margin-top:7px}
+.scan-prog.show{display:block}
+.scan-prog-bar{height:4px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+.scan-prog-fill{height:100%;width:0%;background:var(--brand);transition:width .3s}
+.scan-prog-txt{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px}
+
+.lp-sec-title{
+  padding:12px 14px 4px;font-size:9.5px;font-weight:800;color:#94a3b8;
+  letter-spacing:1px;text-transform:uppercase;
+}
+.lp-item{
+  width:calc(100% - 14px);margin:2px 7px;padding:7px 9px;
+  border-radius:7px;border:none;background:transparent;
+  display:flex;align-items:center;gap:9px;cursor:pointer;
+  text-align:left;color:var(--text);font-size:12px;font-weight:600;
+  transition:.12s;
+}
+.lp-item:hover{background:#f1f5f9}
+.lp-item.active{background:var(--brand-l);color:var(--brand-d);font-weight:700}
+.lp-ico{
+  width:24px;height:24px;border-radius:6px;display:grid;place-items:center;
+  color:#fff;font-size:11px;flex:none;
+}
+.lp-ico.cyan{background:var(--c-cyan)}
+.lp-ico.purple{background:#8b5cf6}
+.lp-ico.orange{background:var(--c-orange)}
+.lp-ico.red{background:var(--c-red)}
+.lp-ico.green{background:var(--c-green)}
+.lp-ico.blue{background:var(--c-blue)}
+.lp-ico.grey{background:var(--c-grey)}
+
+.lp-cnt{
+  margin-left:auto;font-size:10.5px;font-weight:700;
+  padding:1px 7px;border-radius:99px;color:#475569;background:#f1f5f9;
+}
+.lp-item.active .lp-cnt{background:var(--brand);color:#fff}
+
+.lp-footer{
+  margin-top:auto;padding:10px 14px;border-top:1px solid var(--border);
+  font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:6px;
+  background:#f8fafc;
+}
+
+/* ================= RIGHT PANEL (Main Content) ================= */
+.right-panel{
+  padding:14px;min-width:0;display:flex;flex-direction:column;gap:14px;
+}
+
+/* 6 COLORFUL STAT CARDS (2x3 Grid Like Screenshot) */
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:10px;
+}
+.stat-card{
+  border-radius:9px;padding:12px 14px;color:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;overflow:hidden;cursor:pointer;
+  box-shadow:0 3px 8px -3px rgba(0,0,0,.15);transition:transform .12s;
+}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-card.cyan{background:linear-gradient(135deg,#06b6d4,#0891b2)}
+.stat-card.green{background:linear-gradient(135deg,#10b981,#059669)}
+.stat-card.red{background:linear-gradient(135deg,#f43f5e,#e11d48)}
+.stat-card.blue{background:linear-gradient(135deg,#0284c7,#0369a1)}
+.stat-card.orange{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.stat-card.grey{background:linear-gradient(135deg,#64748b,#475569)}
+
+.sc-info small{
+  display:block;font-size:9.5px;font-weight:800;letter-spacing:.7px;
+  text-transform:uppercase;opacity:.9;margin-bottom:2px;
+}
+.sc-info b{display:block;font-size:22px;font-weight:800;line-height:1.1}
+.sc-icon{
+  width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);
+  display:grid;place-items:center;font-size:16px;flex:none;
+}
+
+/* SECTION HEADER & TABLE CARD */
+.view-sec{display:none}
+.view-sec.active{display:block}
+
+.zone-heading{margin-bottom:8px}
+.zone-heading h2{margin:0;font-size:15px;font-weight:800;color:var(--heading)}
+.zone-heading p{margin:2px 0 0;font-size:11px;color:var(--muted)}
+
+.table-card{
+  background:var(--card);border:1px solid var(--border);border-radius:9px;
+  box-shadow:0 1px 3px rgba(0,0,0,.03);overflow:hidden;
+}
+
+/* Filter & Action Bar */
+.filter-bar{
+  padding:10px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:#fcfdfe;
+}
+.fb-left{display:flex;align-items:center;gap:8px;flex:1;min-width:200px}
+.search-box{
+  position:relative;flex:1;max-width:300px;
+}
+.search-box i{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  color:#94a3b8;font-size:11.5px;
+}
+.search-box input{
+  width:100%;padding:6px 10px 6px 28px;border-radius:6px;
+  border:1px solid var(--border);font-size:12px;outline:none;background:#fff;
+}
+.search-box input:focus{border-color:var(--brand)}
+
+.wa-tabs{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#f8fafc}
+.wa-tab{
+  border:none;background:transparent;padding:5px 10px;font-size:11.5px;
+  font-weight:700;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px;
+}
+.wa-tab.active{background:var(--brand);color:#fff}
+
+.fb-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.showing-txt{font-size:11.5px;color:var(--muted)}
+.showing-txt b{color:var(--brand-d);font-weight:800}
+
+/* Direct Bulletproof Select All Button */
+.btn-select-all{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:6px;border:1px solid var(--border);
+  background:#f8fafc;color:var(--heading);font-size:12px;font-weight:700;
+  cursor:pointer;transition:.15s;user-select:none;
+}
+.btn-select-all:hover{border-color:var(--brand);color:var(--brand-d);background:var(--brand-l)}
+.btn-select-all.all-checked{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn-select-all:disabled{opacity:.45;cursor:not-allowed}
+
+/* ================= HORIZONTAL DATA TABLE (Like Screenshot) ================= */
+.table-wrap{
+  width:100%;overflow-x:auto;max-height:calc(100vh - 320px);min-height:240px;
+}
+.cust-table{
+  width:100%;border-collapse:collapse;text-align:left;font-size:12.5px;
+}
+.cust-table thead th{
+  position:sticky;top:0;z-index:10;
+  background:#f1f5f9;color:#475569;font-size:10.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.5px;
+  padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;
+}
+.cust-table tbody tr{
+  border-bottom:1px solid var(--border-2);transition:background .1s;cursor:pointer;
+}
+.cust-table tbody tr:hover{background:#f8fafc}
+.cust-table tbody tr.row-selected{background:#e6fbf6}
+.cust-table td{
+  padding:8px 12px;vertical-align:middle;white-space:nowrap;
+}
+
+.col-chk{width:34px;text-align:center}
+.row-chk{width:16px;height:16px;accent-color:var(--brand);cursor:pointer;vertical-align:middle;margin:0}
+.col-sl{width:55px;color:#64748b;font-weight:600;font-size:11.5px}
+.col-name b{color:#334155;font-weight:700;font-size:12.5px}
+.id-chip{
+  display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;
+  background:#e0f2fe;color:#0369a1;font-size:10px;font-weight:700;
+}
+.col-phone{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:12px;color:#475569}
+.col-exp{font-size:11.5px;color:#64748b}
+
+/* Status Pills like Screenshot */
+.st-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2.5px 9px;border-radius:99px;font-size:10px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.3px;
+}
+.st-pill .dot{width:6px;height:6px;border-radius:50%}
+.st-pill.d0{background:#fee2e2;color:#dc2626}.st-pill.d0 .dot{background:#dc2626}
+.st-pill.d1{background:#fef3c7;color:#d97706}.st-pill.d1 .dot{background:#d97706}
+.st-pill.d3{background:#e0e7ff;color:#4338ca}.st-pill.d3 .dot{background:#4338ca}
+.st-pill.dx{background:#f1f5f9;color:#64748b}.st-pill.dx .dot{background:#64748b}
+.st-pill.sent{background:#dcfce7;color:#15803d;margin-left:5px}.st-pill.sent .dot{background:#16a34a}
+
+.act-group{display:inline-flex;gap:4px}
+.act-btn{
+  width:26px;height:26px;border-radius:6px;border:1px solid var(--border);
+  background:#fff;color:#64748b;display:grid;place-items:center;font-size:11px;
+  cursor:pointer;transition:.12s;
+}
+.act-btn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-l)}
+.act-btn.wa:hover{border-color:#16a34a;color:#16a34a;background:#dcfce7}
+
+/* Bottom Send Bar */
+.bottom-send-bar{
+  padding:10px 14px;background:#f8fafc;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+}
+.bsb-left{font-size:12.5px;font-weight:700;color:var(--heading);display:flex;align-items:center;gap:8px}
+.bsb-badge{
+  background:var(--brand);color:#fff;padding:2px 9px;border-radius:99px;
+  font-size:12px;font-weight:800;
+}
+.btn-send-main{
+  padding:8px 18px;border-radius:7px;border:none;
+  background:linear-gradient(135deg,var(--brand),var(--brand-d));
+  color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;
+  box-shadow:0 4px 12px -4px rgba(0,182,155,.7);
+}
+.btn-send-main:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+
+/* Empty State */
+.empty-box{padding:45px 20px;text-align:center;color:var(--muted)}
+.empty-box i{font-size:28px;color:#cbd5e1;margin-bottom:8px;display:block}
+
+/* Modals */
+.modal-overlay{
+  position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;
+  padding:16px;background:rgba(15,23,42,.55);backdrop-filter:blur(2px);
+}
+.modal-overlay.show{display:flex}
+.modal-card{
+  width:100%;max-width:500px;max-height:90vh;overflow:auto;
+  background:#fff;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.3);
+}
+.modal-head{
+  padding:13px 18px;background:#f1f5f9;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-head b{font-size:14px;color:var(--heading)}
+.modal-close{
+  width:28px;height:28px;border-radius:6px;border:1px solid var(--border);
+  background:#fff;cursor:pointer;
+}
+.modal-body{padding:16px 18px}
+.modal-foot{
+  padding:12px 18px;background:#f8fafc;border-top:1px solid var(--border);
+  display:flex;justify-content:flex-end;gap:8px;
+}
+.btn-ghost{
+  padding:7px 14px;border-radius:6px;border:1px solid var(--border);
+  background:#fff;color:var(--text);font-weight:600;cursor:pointer;
+}
+.msg-area{
+  width:100%;border-radius:8px;border:1px solid var(--border);
+  padding:10px;font-size:12.5px;line-height:1.6;resize:vertical;
+}
+.resend-warn{
+  display:none;padding:10px 12px;border-radius:8px;background:#fffbeb;
+  border:1px solid #fde68a;color:#92400e;font-size:12px;margin-bottom:12px;
+}
+.resend-warn.show{display:block}
+
+/* PIN Overlay */
+#pinOverlay{
+  position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:linear-gradient(135deg,#1e2a38 0%,#0f1620 100%);
+}
+#pinOverlay.hide{display:none}
+.pin-card{
+  width:100%;max-width:320px;background:#fff;border-radius:12px;padding:24px;text-align:center;
+}
+.pin-input{
+  width:100%;padding:10px;text-align:center;font-size:18px;font-weight:800;
+  letter-spacing:8px;border-radius:8px;border:2px solid var(--border);margin:12px 0;
+}
+
+/* Toast */
+#toastBox{position:fixed;top:62px;right:16px;z-index:99999;display:flex;flex-direction:column;gap:6px}
+.toast-item{
+  background:#1e293b;color:#fff;padding:9px 14px;border-radius:7px;
+  font-size:12px;font-weight:600;border-left:4px solid var(--brand);
+  box-shadow:0 8px 20px rgba(0,0,0,.2);
+}
+
+/* Responsive adjustments while keeping Two-Column Split intact */
+@media (max-width: 768px){
+  :root{ --sb-w: 155px; }
+  .stat-grid{ grid-template-columns:repeat(2, 1fr); gap:7px; }
+  .sc-info b{ font-size:17px; }
+  .sc-icon{ width:30px;height:30px;font-size:13px; }
+  .right-panel{ padding:8px; }
+  .lp-item{ font-size:11px; padding:6px 6px; gap:6px; }
+  .lp-ico{ width:20px;height:20px;font-size:9.5px; }
+  .cust-table td, .cust-table thead th{ padding:7px 8px; font-size:11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- PIN LOCK -->
+<div id="pinOverlay">
+  <div class="pin-card">
+    <h3 style="margin:0 0 4px;color:var(--heading)">Meherpur Internet</h3>
+    <p style="margin:0;font-size:11.5px;color:var(--muted)">Enter Security PIN</p>
+    <input type="password" id="pinInput" class="pin-input" maxlength="10" placeholder="••••">
+    <button class="scan-btn" onclick="verifyPin()">Unlock Dashboard</button>
+    <div id="pinErr" style="color:#dc2626;font-size:11.5px;margin-top:8px;display:none">Invalid PIN!</div>
+  </div>
+</div>
+
+<!-- TOP NAVBAR -->
+<header class="top-navbar">
+  <div class="tn-left">
+    <div class="tn-logo"><i class="fas fa-tower-broadcast"></i></div>
+    <div class="tn-brand">
+      <b>Vision Exclusive Showroom</b>
+      <small>Shamim Reza &middot; Meherpur Internet</small>
+    </div>
+  </div>
+  <div class="tn-right">
+    <button class="tn-btn offline" id="statusPill" onclick="handleStatusClick()" title="Server Status">
+      <i class="fas fa-circle-notch fa-spin"></i>
+    </button>
+    <button class="tn-btn" id="refreshBtn" title="Refresh"><i class="fas fa-rotate"></i></button>
+  </div>
+</header>
+
+<!-- SPLIT WORKSPACE (Left & Right Always Visible) -->
+<div class="workspace">
+
+  <!-- LEFT PANEL -->
+  <aside class="left-panel">
+    <div class="lp-header">
+      <div class="lp-header-ico"><i class="fas fa-list-check"></i></div>
+      <div class="lp-header-txt">
+        <b>Billing Overview</b>
+        <small>Click to filter table</small>
+      </div>
+    </div>
+
+    <div class="lp-scan-box">
+      <button class="scan-btn" id="sideScanBtn"><i class="fas fa-bolt"></i> Scan Customers</button>
+      <div class="scan-prog" id="scanProgressBox">
+        <div class="scan-prog-bar"><div class="scan-prog-fill" id="scanBar"></div></div>
+        <div class="scan-prog-txt">
+          <span id="scanStatusText">Scanning...</span>
+          <span id="scanPctText">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="lp-sec-title">EXPIRING (0, 1 &amp; 3 DAYS)</div>
+    <button class="lp-item active" data-nav="all-3days">
+      <span class="lp-ico cyan"><i class="fas fa-layer-group"></i></span>
+      <span>All Within 3 Days</span>
+      <span class="lp-cnt" id="sideCntAll">0</span>
+    </button>
+    <button class="lp-item" data-nav="3days">
+      <span class="lp-ico purple"><i class="fas fa-calendar-plus"></i></span>
+      <span>3 Days Later</span>
+      <span class="lp-cnt" id="sideCnt3">0</span>
+    </button>
+    <button class="lp-item" data-nav="tomorrow">
+      <span class="lp-ico orange"><i class="fas fa-sun"></i></span>
+      <span>Tomorrow</span>
+      <span class="lp-cnt" id="sideCnt1">0</span>
+    </button>
+    <button class="lp-item" data-nav="today">
+      <span class="lp-ico red"><i class="fas fa-bell"></i></span>
+      <span>Today</span>
+      <span class="lp-cnt" id="sideCnt0">0</span>
+    </button>
+
+    <div class="lp-sec-title">MESSAGE STATUS</div>
+    <button class="lp-item" data-nav="not-sent-today">
+      <span class="lp-ico blue"><i class="fas fa-clock"></i></span>
+      <span>Not Sent Today</span>
+      <span class="lp-cnt" id="sideCntUnsent">0</span>
+    </button>
+    <button class="lp-item" data-nav="sent-today">
+      <span class="lp-ico green"><i class="fas fa-check-double"></i></span>
+      <span>Sent Today</span>
+      <span class="lp-cnt" id="sideCntSent">0</span>
+    </button>
+
+    <div class="lp-sec-title">EXPIRED &amp; LOGS</div>
+    <button class="lp-item" data-nav="expired">
+      <span class="lp-ico grey"><i class="fas fa-user-xmark"></i></span>
+      <span>Already Expired</span>
+      <span class="lp-cnt" id="sideCntExp">0</span>
+    </button>
+    <button class="lp-item" data-nav="history">
+      <span class="lp-ico cyan"><i class="fas fa-clock-rotate-left"></i></span>
+      <span>History Log</span>
+      <span class="lp-cnt" id="tabLogCnt">0</span>
+    </button>
+
+    <div class="lp-footer">
+      <i class="fas fa-clock" style="color:var(--brand)"></i>
+      <span id="stripLastScan">Not scanned yet</span>
+    </div>
+  </aside>
+
+  <!-- RIGHT PANEL -->
+  <main class="right-panel">
+
+    <!-- 6 COLORFUL CARDS (Like Screenshot) -->
+    <div class="stat-grid">
+      <div class="stat-card cyan" onclick="navigateTo('all-3days')">
+        <div class="sc-info"><small>ALL WITHIN 3 DAYS</small><b id="cardAll">0</b></div>
+        <div class="sc-icon"><i class="fas fa-users"></i></div>
+      </div>
+      <div class="stat-card green" onclick="navigateTo('sent-today')">
+        <div class="sc-info"><small>SENT TODAY</small><b id="cardSent">0</b></div>
+        <div class="sc-icon"><i class="fas fa-check"></i></div>
+      </div>
+      <div class="stat-card red" onclick="navigateTo('today')">
+        <div class="sc-info"><small>EXPIRING TODAY</small><b id="cardToday">0</b></div>
+        <div class="sc-icon"><i class="fas fa-bell"></i></div>
+      </div>
+      <div class="stat-card blue" onclick="navigateTo('3days')">
+        <div class="sc-info"><small>3 DAYS LATER</small><b id="card3Days">0</b></div>
+        <div class="sc-icon"><i class="fas fa-calendar-day"></i></div>
+      </div>
+      <div class="stat-card orange" onclick="navigateTo('tomorrow')">
+        <div class="sc-info"><small>TOMORROW</small><b id="cardTomorrow">0</b></div>
+        <div class="sc-icon"><i class="fas fa-sun"></i></div>
+      </div>
+      <div class="stat-card grey" onclick="navigateTo('expired')">
+        <div class="sc-info"><small>ALREADY EXPIRED</small><b id="cardExpired">0</b></div>
+        <div class="sc-icon"><i class="fas fa-user-slash"></i></div>
+      </div>
+    </div>
+
+    <!-- VIEW: CUSTOMERS TABLE -->
+    <section class="view-sec active" id="viewCustomers">
+      <div class="zone-heading">
+        <h2 id="pageTitle">All Within 3 Days</h2>
+        <p id="pageSub">Showing Today, Tomorrow &amp; 3 Days Later customers (2 Days Later excluded)</p>
+      </div>
+
+      <div class="table-card">
+        <div class="filter-bar">
+          <div class="fb-left">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="searchInput" placeholder="Search by Name, ID, Phone...">
+            </div>
+            <div class="wa-tabs" id="tabStrip">
+              <button class="wa-tab active" data-tab="wa"><i class="fab fa-whatsapp"></i> WA (<span id="tabWaCnt">0</span>)</button>
+              <button class="wa-tab" data-tab="nowa"><i class="fas fa-phone-slash"></i> No WA (<span id="tabNoWaCnt">0</span>)</button>
+            </div>
+          </div>
+
+          <div class="fb-right">
+            <span class="showing-txt">Showing <b id="visibleCount">0</b> &middot; Selected <b id="selCountTop">0</b></span>
+            <button type="button" class="btn-select-all" id="selectAllBtn" onclick="handleSelectAll()">
+              <i class="fas fa-check-square" id="selectAllIcon"></i>
+              <span id="selectAllLabel">Select All</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- HORIZONTAL TABLE -->
+        <div class="table-wrap">
+          <table class="cust-table">
+            <thead>
+              <tr>
+                <th class="col-chk" id="thChkCell">
+                  <input type="checkbox" class="row-chk" id="masterTableChk" onclick="handleSelectAll()">
+                </th>
+                <th class="col-sl">SL</th>
+                <th>CUSTOMER &amp; ID</th>
+                <th>PHONE NUMBER</th>
+                <th>EXPIRE DATE</th>
+                <th>STATUS</th>
+                <th style="text-align:right" id="thActCell">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- SEND FOOTER BAR -->
+        <div class="bottom-send-bar" id="sendBarEl">
+          <div class="bsb-left">
+            <i class="fas fa-check-circle" style="color:var(--brand)"></i>
+            Selected Recipients: <span class="bsb-badge" id="selCountBtn">0</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span id="sendProgressText" style="font-size:12px;color:var(--brand-d);font-weight:700;display:none">Sending...</span>
+            <button class="btn-send-main" id="mainSendBtn" disabled onclick="startSendSelected()">
+              <i class="fab fa-whatsapp"></i> Send Messages
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: HISTORY LOG -->
+    <section class="view-sec" id="viewHistory">
+      <div class="zone-heading" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2>Message History</h2>
+          <p>Log of messages dispatched from this device</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost" id="clearLogBtn"><i class="fas fa-trash"></i> Clear</button>
+          <button class="btn-ghost" id="exportLogBtn"><i class="fas fa-download"></i> Export CSV</button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table class="cust-table">
+            <thead>
+              <tr>
+                <th class="col-sl">SL</th>
+                <th>CUSTOMER</th>
+                <th>PHONE</th>
+                <th>TIME</th>
+                <th>MESSAGE</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL: CONFIRM SEND -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <b><i class="fas fa-paper-plane" style="color:var(--brand)"></i> Confirm &amp; Send</b>
+      <button class="modal-close" data-close><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="resend-warn" id="resendWarning">
+        <b><i class="fas fa-triangle-exclamation"></i> এই মেসেজগুলো অলরেডি পাঠানো হয়েছে!</b>
+        <div id="resendWarningText" style="margin-top:3px"></div>
+      </div>
+      <div id="recipientSummary" style="margin-bottom:10px;font-weight:700;color:var(--heading)"></div>
+      <label style="display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:6px">Message Preview:</label>
+      <textarea class="msg-area" id="confirmMessage" rows="6"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" data-close>Cancel</button>
+      <button class="btn-send-main" id="confirmSendBtn"><i class="fab fa-whatsapp"></i> Send Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDIT MESSAGE -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <b><i class="fas fa-pen-to-square" style="color:var(--brand)"></i> Edit Customer Message</b>
+      <button class="modal-close" data-close><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="edCustomerTitle" style="font-weight:700;margin-bottom:10px;color:var(--heading)"></div>
+      <textarea class="msg-area" id="editMsgArea" rows="7"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" data-close>Cancel</button>
+      <button class="btn-send-main" id="editSaveBtn"><i class="fas fa-check"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: OFFLINE -->
+<div class="modal-overlay" id="offlineModal">
+  <div class="modal-card" style="max-width:360px;text-align:center">
+    <div class="modal-head">
+      <b>Server Offline</b>
+      <button class="modal-close" data-close><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <i class="fas fa-power-off" style="font-size:36px;color:#dc2626;margin-bottom:10px"></i>
+      <p style="margin:0;font-weight:600">Please make sure the backend server &amp; WhatsApp are connected.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-send-main" data-close style="width:100%;justify-content:center">Okay</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastBox"></div>
+
+<script>
+/* =====================================================================
+   FRESH KEYS & CONFIG
+   ===================================================================== */
+const ACCESS_PIN   = "1234";
+const PIN_STORE_KEY= "mhpi_v2_pin_auth_9951";
+const LOG_KEY      = "mhpi_v2_sms_log_9951";
+/* নোট: আপনার পাইথন স্ক্রিপ্টে নতুন চ্যানেল দিলে এখানে নাম পরিবর্তন করে নিন */
+const SYNC_CHANNEL = "mhpi_isp_tunnel_sync_8842";
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+let API_BASE       = "";
+let serverOnline   = false;
+let waConnected    = false;
+
+let allResults     = [];
+let selectedIds    = new Set();
+let customMessages = {};
+
+let pendingAutoSelect = false;
+let wasSending        = false;
+let lastSignature     = "";
+let activeTab         = "wa";
+let currentNav        = "all-3days";
+let searchQuery       = "";
+let pendingSendIds    = [];
+let editingId         = null;
+
+let smsLog = [];
+try { smsLog = JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); } catch(e){ smsLog = []; }
+
+const $ = id => document.getElementById(id);
+
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function onlyDigits(s){ return String(s||"").replace(/[^\d+]/g,""); }
+
+/* শুধুমাত্র আজ (0), আগামীকাল (1) এবং ৩ দিন পর (3) — ২ দিন পরের (2) ইউজার বাদ */
+function isTarget3Days(days){
+  return days === 0 || days === 1 || days === 3;
+}
+
+function toast(msg){
+  const el = document.createElement("div");
+  el.className = "toast-item";
+  el.innerText = msg;
+  $("toastBox").appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
+
+function copyText(text, label){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); } catch(e){}
+  document.body.removeChild(ta);
+  toast(label || "Copied!");
+}
+
+function fmtDate(iso){
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  } catch(e){ return iso; }
+}
+
+function startOfToday(){
+  const d = new Date(); d.setHours(0,0,0,0); return d;
+}
+
+function getTodaySentMap(){
+  const start = startOfToday();
+  const map = new Map();
+  smsLog.forEach(l => {
+    try {
+      if (new Date(l.time) >= start && !map.has(l.idname)) map.set(l.idname, l);
+    } catch(e){}
+  });
+  return map;
+}
+
+function isAfter4pm(){ return new Date().getHours() >= 16; }
+
+function adjustResults(results){
+  if (!Array.isArray(results)) return [];
+  if (!isAfter4pm()) return results;
+  return results.map(u => {
+    if (u.days_left === 0) return Object.assign({}, u, { days_left: -1, day_label: 'Expired' });
+    return u;
+  });
+}
+
+/* =====================================================================
+   PIN LOCK
+   ===================================================================== */
+(function initPin(){
+  if (localStorage.getItem(PIN_STORE_KEY) === ACCESS_PIN) {
+    $("pinOverlay").classList.add("hide");
+  }
+})();
+
+function verifyPin(){
+  if (($("pinInput").value || "").trim() === ACCESS_PIN) {
+    localStorage.setItem(PIN_STORE_KEY, ACCESS_PIN);
+    $("pinOverlay").classList.add("hide");
+  } else {
+    $("pinErr").style.display = "block";
+    $("pinInput").value = "";
+  }
+}
+$("pinInput").addEventListener("keydown", e => { if (e.key === "Enter") verifyPin(); });
+
+/* =====================================================================
+   MODALS
+   ===================================================================== */
+function openModal(id){ $(id).classList.add("show"); }
+function closeModal(id){ $(id).classList.remove("show"); }
+document.querySelectorAll(".modal-overlay").forEach(m => {
+  m.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", () => m.classList.remove("show")));
+  m.addEventListener("click", e => { if (e.target === m) m.classList.remove("show"); });
+});
+function showOfflineModal(){ openModal("offlineModal"); }
+function handleStatusClick(){ if (!serverOnline || !waConnected) showOfflineModal(); }
+
+/* =====================================================================
+   NAVIGATION & FILTERING
+   ===================================================================== */
+const NAV_META = {
+  'all-3days':      { title: 'All Within 3 Days',  sub: 'Showing Today, Tomorrow & 3 Days Later customers (2 Days Later excluded)' },
+  '3days':          { title: '3 Days Later',       sub: 'Customers expiring in exactly 3 days' },
+  'tomorrow':       { title: 'Tomorrow',           sub: 'Customers expiring tomorrow' },
+  'today':          { title: 'Today',              sub: 'Customers expiring today' },
+  'not-sent-today': { title: 'Not Sent Today',     sub: 'Pending customers waiting for message' },
+  'sent-today':     { title: 'Sent Today',         sub: 'Messages already delivered today (View Only)' },
+  'expired':        { title: 'Already Expired',    sub: 'Customers whose billing date has passed (View Only)' },
+  'history':        { title: 'Message History',    sub: 'All messages sent from this panel' }
+};
+
+function isReadOnlyNav(){
+  return currentNav === 'expired' || currentNav === 'sent-today';
+}
+
+function navigateTo(key){
+  if (!NAV_META[key]) return;
+  currentNav = key;
+
+  document.querySelectorAll('.lp-item').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector('.lp-item[data-nav="' + key + '"]');
+  if (activeBtn) activeBtn.classList.add('active');
+
+  if (key === 'history') {
+    $("viewCustomers").classList.remove("active");
+    $("viewHistory").classList.add("active");
+    renderLog();
+    return;
+  }
+
+  $("viewHistory").classList.remove("active");
+  $("viewCustomers").classList.add("active");
+  $("pageTitle").innerText = NAV_META[key].title;
+  $("pageSub").innerText   = NAV_META[key].sub;
+
+  if (isReadOnlyNav()) selectedIds.clear();
+  renderList();
+}
+
+document.querySelectorAll('.lp-item[data-nav]').forEach(btn => {
+  btn.addEventListener('click', () => navigateTo(btn.dataset.nav));
+});
+
+$("searchInput").addEventListener("input", e => {
+  searchQuery = (e.target.value || "").trim().toLowerCase();
+  renderList();
+});
+
+function getCategoryUsers(){
+  const sentMap = getTodaySentMap();
+  if (currentNav === 'all-3days')    return allResults.filter(u => isTarget3Days(u.days_left));
+  if (currentNav === '3days')        return allResults.filter(u => u.days_left === 3);
+  if (currentNav === 'tomorrow')     return allResults.filter(u => u.days_left === 1);
+  if (currentNav === 'today')        return allResults.filter(u => u.days_left === 0);
+  if (currentNav === 'expired')      return allResults.filter(u => u.days_left < 0);
+  if (currentNav === 'sent-today')   return allResults.filter(u => u.sent || sentMap.has(u.idname));
+  if (currentNav === 'not-sent-today') {
+    return allResults.filter(u => u.has_wa && !u.sent && !sentMap.has(u.idname) && isTarget3Days(u.days_left));
+  }
+  return [];
+}
+
+function getVisibleUsers(){
+  const raw = getCategoryUsers();
+  const tabFiltered = isReadOnlyNav() ? raw : raw.filter(u => !!u.has_wa === (activeTab === 'wa'));
+  if (!searchQuery) return tabFiltered;
+  return tabFiltered.filter(u =>
+    String(u.name||"").toLowerCase().includes(searchQuery) ||
+    String(u.idname||"").toLowerCase().includes(searchQuery) ||
+    String(u.local_phone||"").toLowerCase().includes(searchQuery)
+  );
+}
+
+/* =====================================================================
+   STATS UPDATE
+   ===================================================================== */
+function renderStats(){
+  const sentMap = getTodaySentMap();
+  const cAll    = allResults.filter(u => u.has_wa && isTarget3Days(u.days_left)).length;
+  const c3      = allResults.filter(u => u.has_wa && u.days_left === 3).length;
+  const c1      = allResults.filter(u => u.has_wa && u.days_left === 1).length;
+  const c0      = allResults.filter(u => u.has_wa && u.days_left === 0).length;
+  const cExp    = allResults.filter(u => u.days_left < 0).length;
+  const cSent   = allResults.filter(u => u.sent || sentMap.has(u.idname)).length;
+  const cUnsent = allResults.filter(u => u.has_wa && !u.sent && !sentMap.has(u.idname) && isTarget3Days(u.days_left)).length;
+
+  $("sideCntAll").innerText    = cAll;
+  $("sideCnt3").innerText      = c3;
+  $("sideCnt1").innerText      = c1;
+  $("sideCnt0").innerText      = c0;
+  $("sideCntExp").innerText    = cExp;
+  $("sideCntSent").innerText   = cSent;
+  $("sideCntUnsent").innerText = cUnsent;
+  $("tabLogCnt").innerText     = smsLog.length;
+
+  /* Top 6 Cards */
+  $("cardAll").innerText      = cAll;
+  $("cardSent").innerText     = cSent;
+  $("cardToday").innerText    = c0;
+  $("card3Days").innerText    = c3;
+  $("cardTomorrow").innerText = c1;
+  $("cardExpired").innerText  = cExp;
+}
+
+/* =====================================================================
+   100% WORKING SELECT ALL / UNSELECT ALL
+   ===================================================================== */
+function isSelectableView(){
+  return !isReadOnlyNav() && activeTab === 'wa';
+}
+
+window.handleSelectAll = function(){
+  if (!isSelectableView()) return;
+  const visible = getVisibleUsers();
+  if (visible.length === 0) return;
+
+  const everySelected = visible.every(u => selectedIds.has(u.idname));
+  if (everySelected) {
+    /* এক ক্লিকে সব আনসিলেক্ট */
+    visible.forEach(u => selectedIds.delete(u.idname));
+  } else {
+    /* এক ক্লিকে সব সিলেক্ট */
+    visible.forEach(u => selectedIds.add(u.idname));
+  }
+  renderList();
+};
+
+window.toggleSingleRow = function(idname, trEl, event){
+  if (event && event.target.closest('button, a')) return;
+  if (!isSelectableView()) return;
+
+  if (selectedIds.has(idname)) selectedIds.delete(idname);
+  else selectedIds.add(idname);
+
+  renderList();
+};
+
+function syncSelectAllButtonState(visible){
+  const btn   = $("selectAllBtn");
+  const label = $("selectAllLabel");
+  const icon  = $("selectAllIcon");
+  const mChk  = $("masterTableChk");
+
+  if (!isSelectableView() || visible.length === 0) {
+    btn.disabled = true;
+    btn.classList.remove("all-checked");
+    label.innerText = "Select All";
+    icon.className = "far fa-square";
+    if (mChk) { mChk.checked = false; mChk.disabled = true; }
+    return;
+  }
+
+  btn.disabled = false;
+  if (mChk) mChk.disabled = false;
+
+  const selCount = visible.filter(u => selectedIds.has(u.idname)).length;
+  const allChecked = (selCount === visible.length && visible.length > 0);
+
+  if (mChk) {
+    mChk.checked = allChecked;
+    mChk.indeterminate = (selCount > 0 && !allChecked);
+  }
+
+  if (allChecked) {
+    btn.classList.add("all-checked");
+    label.innerText = "Unselect All";
+    icon.className = "fas fa-check-square";
+  } else {
+    btn.classList.remove("all-checked");
+    label.innerText = "Select All";
+    icon.className = "far fa-square";
+  }
+}
+
+/* =====================================================================
+   RENDER HORIZONTAL TABLE
+   ===================================================================== */
+function renderList(){
+  const readonly = isReadOnlyNav();
+  const catUsers = getCategoryUsers();
+
+  if (!readonly) {
+    $("tabWaCnt").innerText   = catUsers.filter(u => u.has_wa).length;
+    $("tabNoWaCnt").innerText = catUsers.filter(u => !u.has_wa).length;
+    $("tabStrip").style.display = "inline-flex";
+    $("sendBarEl").style.display = "flex";
+    $("selectAllBtn").style.display = "inline-flex";
+  } else {
+    $("tabStrip").style.display = "none";
+    $("sendBarEl").style.display = "none";
+    $("selectAllBtn").style.display = "none";
+  }
+
+  const visible = getVisibleUsers();
+  $("visibleCount").innerText = visible.length;
+  $("selCountTop").innerText  = selectedIds.size;
+  $("selCountBtn").innerText  = selectedIds.size;
+  $("mainSendBtn").disabled   = (selectedIds.size === 0);
+
+  const canSelect = isSelectableView();
+  $("thChkCell").style.display = canSelect ? "" : "none";
+  $("thActCell").style.display = readonly ? "none" : "";
+
+  syncSelectAllButtonState(visible);
+
+  const tbody = $("tableBody");
+  if (visible.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-box"><i class="fas fa-folder-open"></i>No customers found in this section.</div></td></tr>';
+    return;
+  }
+
+  const sentMap = getTodaySentMap();
+
+  tbody.innerHTML = visible.map((u, idx) => {
+    const isSel = selectedIds.has(u.idname);
+    const safeId = esc(u.idname);
+    const jsId = u.idname.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    const isSent = u.sent || sentMap.has(u.idname);
+
+    const pillCls = isTarget3Days(u.days_left) ? ("d" + u.days_left) : "dx";
+    const statusHtml =
+      '<span class="st-pill ' + pillCls + '"><span class="dot"></span>' + esc(u.day_label || 'Expired') + '</span>' +
+      (isSent ? '<span class="st-pill sent"><span class="dot"></span>SENT</span>' : '');
+
+    let actionHtml = '';
+    if (!readonly) {
+      if (activeTab === 'wa') {
+        actionHtml =
+          '<td style="text-align:right"><div class="act-group">' +
+            '<button class="act-btn" onclick="openEditModal(\'' + jsId + '\')" title="Edit Message"><i class="fas fa-pen"></i></button>' +
+            '<button class="act-btn wa" onclick="openConfirmSend([\'' + jsId + '\'])" title="Send / Resend"><i class="fab fa-whatsapp"></i></button>' +
+            '<button class="act-btn" onclick="copyText(\'' + esc(u.local_phone) + '\')" title="Copy Phone"><i class="fas fa-copy"></i></button>' +
+          '</div></td>';
+      } else {
+        const ph = onlyDigits(u.local_phone);
+        const smsBody = encodeURIComponent(customMessages[u.idname] || u.message || "");
+        actionHtml =
+          '<td style="text-align:right"><div class="act-group">' +
+            '<a class="act-btn" href="sms:' + ph + '?body=' + smsBody + '" title="Send SMS"><i class="fas fa-comment-sms"></i></a>' +
+            '<a class="act-btn wa" href="tel:' + ph + '" title="Call"><i class="fas fa-phone"></i></a>' +
+            '<button class="act-btn" onclick="copyText(\'' + esc(u.local_phone) + '\')" title="Copy Phone"><i class="fas fa-copy"></i></button>' +
+          '</div></td>';
+      }
+    }
+
+    return '<tr class="' + (isSel && canSelect ? 'row-selected' : '') + '" onclick="toggleSingleRow(\'' + jsId + '\', this, event)">' +
+      (canSelect ? '<td class="col-chk"><input type="checkbox" class="row-chk" ' + (isSel ? 'checked' : '') + ' readonly></td>' : '') +
+      '<td class="col-sl">1/' + (idx + 1) + '</td>' +
+      '<td class="col-name"><b>' + esc(u.name) + '</b><span class="id-chip">' + safeId + '</span></td>' +
+      '<td class="col-phone">' + esc(u.local_phone) + '</td>' +
+      '<td class="col-exp">' + esc(u.expire_date) + '</td>' +
+      '<td>' + statusHtml + '</td>' +
+      actionHtml +
+    '</tr>';
+  }).join('');
+}
+
+function renderAll(){
+  renderStats();
+  renderList();
+}
+
+/* =====================================================================
+   TABS (WA / No WA)
+   ===================================================================== */
+document.querySelectorAll('.wa-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.wa-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeTab = btn.dataset.tab;
+    renderList();
+  });
+});
+
+/* =====================================================================
+   EDIT & SEND MODALS
+   ===================================================================== */
+window.openEditModal = function(idname){
+  const u = allResults.find(x => x.idname === idname);
+  if (!u) return;
+  editingId = idname;
+  $("edCustomerTitle").innerText = u.name + " (" + u.idname + ") — " + u.local_phone;
+  $("editMsgArea").value = customMessages[idname] || u.message || "";
+  openModal("editModal");
+};
+
+$("editSaveBtn").addEventListener("click", () => {
+  if (editingId) customMessages[editingId] = $("editMsgArea").value;
+  editingId = null;
+  closeModal("editModal");
+  toast("Message saved!");
+});
+
+window.openConfirmSend = function(ids){
+  if (!ids || !ids.length) return;
+  if (!serverOnline || !waConnected) return showOfflineModal();
+
+  pendingSendIds = ids.slice();
+  const sentMap = getTodaySentMap();
+  const already = ids.filter(id => {
+    const u = allResults.find(x => x.idname === id);
+    return u && (u.sent || sentMap.has(id));
+  });
+
+  if (already.length > 0) {
+    $("resendWarning").classList.add("show");
+    $("resendWarningText").innerText = already.length + " জন গ্রাহককে আজকে ইতিমধ্যে মেসেজ পাঠানো হয়েছে। আপনি কি পুনরায় পাঠাতে চান?";
+  } else {
+    $("resendWarning").classList.remove("show");
+  }
+
+  if (ids.length === 1) {
+    const u = allResults.find(x => x.idname === ids[0]);
+    $("recipientSummary").innerText = "Recipient: " + (u ? u.name + " (" + u.local_phone + ")" : ids[0]);
+    $("confirmMessage").value = u ? (customMessages[u.idname] || u.message || "") : "";
+    $("confirmMessage").readOnly = false;
+  } else {
+    $("recipientSummary").innerText = "Total Selected Recipients: " + ids.length + " Customers";
+    $("confirmMessage").value = "প্রত্যেক গ্রাহক তার নিজস্ব নির্ধারিত মেসেজ পাবেন।";
+    $("confirmMessage").readOnly = true;
+  }
+
+  openModal("confirmModal");
+};
+
+$("confirmSendBtn").addEventListener("click", async () => {
+  if (!pendingSendIds.length) return;
+  const ids = pendingSendIds.slice();
+  if (ids.length === 1) customMessages[ids[0]] = $("confirmMessage").value;
+  closeModal("confirmModal");
+  await sendToServer(ids);
+});
+
+window.startSendSelected = function(){
+  const ids = Array.from(selectedIds);
+  if (!ids.length) return toast("Please select at least 1 customer.");
+  openConfirmSend(ids);
+};
+
+async function sendToServer(ids){
+  if (!serverOnline || !waConnected) return showOfflineModal();
+  wasSending = true;
+  $("sendProgressText").style.display = "inline";
+  $("mainSendBtn").disabled = true;
+
+  ids.forEach(id => {
+    const u = allResults.find(x => x.idname === id);
+    if (u) {
+      smsLog.unshift({
+        id: Date.now() + Math.random(),
+        idname: u.idname, name: u.name, phone: u.local_phone,
+        message: customMessages[id] || u.message || "",
+        time: new Date().toISOString()
+      });
+    }
+  });
+  try { localStorage.setItem(LOG_KEY, JSON.stringify(smsLog.slice(0, 800))); } catch(e){}
+
+  try {
+    await fetch(API_BASE + "/api/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: ids, custom_messages: customMessages })
+    });
+    toast("Sending " + ids.length + " message(s)...");
+  } catch(e) {
+    toast("Error sending messages.");
+    $("mainSendBtn").disabled = false;
+  }
+}
+
+/* =====================================================================
+   HISTORY LOG TABLE
+   ===================================================================== */
+function renderLog(){
+  const tbody = $("historyTableBody");
+  if (!smsLog.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-box">No message history yet.</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = smsLog.map((item, i) =>
+    '<tr>' +
+      '<td class="col-sl">' + (i + 1) + '</td>' +
+      '<td><b>' + esc(item.name) + '</b> <span class="id-chip">' + esc(item.idname) + '</span></td>' +
+      '<td class="col-phone">' + esc(item.phone) + '</td>' +
+      '<td class="col-exp">' + esc(fmtDate(item.time)) + '</td>' +
+      '<td style="max-width:320px;overflow:hidden;text-overflow:ellipsis">' + esc(item.message) + '</td>' +
+    '</tr>'
+  ).join('');
+}
+
+$("clearLogBtn").addEventListener("click", () => {
+  if (!confirm("Clear all message history?")) return;
+  smsLog = [];
+  localStorage.removeItem(LOG_KEY);
+  renderLog();
+  renderAll();
+});
+
+$("exportLogBtn").addEventListener("click", () => {
+  if (!smsLog.length) return toast("Nothing to export.");
+  const rows = ["Customer,ID,Phone,Time,Message"].concat(
+    smsLog.map(i => [
+      '"'+i.name+'"', i.idname, i.phone, '"'+fmtDate(i.time)+'"', '"'+String(i.message||"").replace(/"/g,'""')+'"'
+    ].join(","))
+  ).join("\n");
+  const blob = new Blob([rows], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "sms_history_" + Date.now() + ".csv";
+  a.click();
+});
+
+/* =====================================================================
+   SCAN & SERVER POLLING
+   ===================================================================== */
+$("sideScanBtn").addEventListener("click", async () => {
+  if (!serverOnline || !waConnected) return showOfflineModal();
+  pendingAutoSelect = true;
+  $("sideScanBtn").disabled = true;
+  $("scanProgressBox").classList.add("show");
+  try {
+    await fetch(API_BASE + "/api/scan?force=0", { method: "POST" });
+    toast("Scanning started...");
+  } catch(e) {
+    $("sideScanBtn").disabled = false;
+  }
+});
+
+function setStatusPill(mode){
+  const p = $("statusPill");
+  p.className = "tn-btn " + mode;
+  if (mode === "online") p.innerHTML = '<i class="fab fa-whatsapp"></i>';
+  else if (mode === "warn") p.innerHTML = '<i class="fas fa-triangle-exclamation"></i>';
+  else p.innerHTML = '<i class="fas fa-power-off"></i>';
+}
+
+async function syncTunnelUrl(){
+  try {
+    const res = await fetch("https://ntfy.sh/" + SYNC_CHANNEL + "/json?poll=1&since=48h");
+    const text = await res.text();
+    const lines = text.trim().split("\n").filter(Boolean);
+    for (let i = lines.length - 1; i >= 0; i--) {
+      let obj; try { obj = JSON.parse(lines[i]); } catch(e){ continue; }
+      if (obj.event === "message" && typeof obj.message === "string") {
+        const msg = obj.message.trim();
+        if (msg === "OFFLINE") API_BASE = "";
+        else if (msg.startsWith("http")) API_BASE = msg.replace(/\/+$/, "");
+        break;
+      }
+    }
+  } catch(e){}
+}
+
+function signatureOf(list){
+  return list.map(u => [u.idname, u.days_left, u.has_wa?1:0, u.sent?1:0].join("|")).join("~");
+}
+
+async function pollState(){
+  if (!API_BASE) { serverOnline = false; waConnected = false; setStatusPill("offline"); return; }
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 3500);
+    const res = await fetch(API_BASE + "/api/state", { signal: ctrl.signal });
+    clearTimeout(timer);
+    const data = await res.json();
+
+    serverOnline = true;
+    waConnected  = !!data.wa_connected;
+    setStatusPill(waConnected ? "online" : "warn");
+
+    if (data.last_scan_time) $("stripLastScan").innerText = "Last scan: " + data.last_scan_time;
+
+    if (data.scanning) {
+      pendingAutoSelect = true;
+      $("scanProgressBox").classList.add("show");
+      const pct = data.scan_total > 0 ? Math.round((data.scan_progress / data.scan_total) * 100) : 0;
+      $("scanBar").style.width = pct + "%";
+      $("scanPctText").innerText = pct + "%";
+      $("scanStatusText").innerText = data.scan_status || "Scanning...";
+      $("sideScanBtn").disabled = true;
+    } else {
+      $("sideScanBtn").disabled = false;
+      $("scanProgressBox").classList.remove("show");
+    }
+
+    if (Array.isArray(data.results) && !data.scanning) {
+      const adjusted = adjustResults(data.results);
+      const sig = signatureOf(adjusted);
+      if (sig !== lastSignature || allResults.length === 0) {
+        allResults = adjusted;
+        lastSignature = sig;
+        renderAll();
+      } else {
+        renderStats();
+      }
+
+      if (pendingAutoSelect && allResults.length > 0) {
+        pendingAutoSelect = false;
+        if (isSelectableView()) {
+          getVisibleUsers().forEach(u => { if (!u.sent) selectedIds.add(u.idname); });
+          renderList();
+        }
+      }
+    }
+
+    if (data.sending) {
+      wasSending = true;
+      const spct = data.send_total > 0 ? Math.round((data.send_progress / data.send_total) * 100) : 0;
+      $("sendProgressText").style.display = "inline";
+      $("sendProgressText").innerText = (data.send_status || "Sending") + " (" + spct + "%)";
+      $("mainSendBtn").disabled = true;
+    } else if (wasSending) {
+      wasSending = false;
+      $("sendProgressText").style.display = "none";
+      toast("All messages sent!");
+      renderAll();
+    }
+  } catch(e) {
+    serverOnline = false; waConnected = false; setStatusPill("offline");
+  }
+}
+
+$("refreshBtn").addEventListener("click", async () => {
+  await syncTunnelUrl();
+  await pollState();
+  toast("Refreshed!");
+});
+
+(async function boot(){
+  navigateTo('all-3days');
+  await syncTunnelUrl();
+  await pollState();
+  setInterval(syncTunnelUrl, 4000);
+  setInterval(pollState, 1500);
+})();
+</script>
+</body>
+</html>
