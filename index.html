@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meherpur Internet — Admin Panel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --brand:#00CEA0;--brand-d:#00a884;--brand-l:#e6fbf6;--brand-s:rgba(0,206,160,.12);
+  --heading:#334155;--text:#475569;--text-2:#64748b;--muted:#94a3b8;
+  --bg:#edf2f7;--card:#ffffff;--border:#e2e8f0;--border-2:#f1f5f9;
+  --ok:#22c55e;--danger:#ef4444;--warn:#f59e0b;--info:#3b82f6;
+  --sb-w:245px;--hdr-h:54px;
+}
+html,body{height:100%;margin:0}
+body{
+  font-family:'Inter','Hind Siliguri',system-ui,-apple-system,sans-serif;
+  font-size:13px;line-height:1.5;color:var(--text);background:var(--bg);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+button,input,select,textarea{font-family:inherit}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4,h5,h6{margin:0;color:var(--heading);font-weight:700}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(100,116,139,.25);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(100,116,139,.4)}
+
+/* TWO SECTION FIXED SPLIT LAYOUT */
+.app-layout{
+  display:grid;
+  grid-template-columns:var(--sb-w) minmax(0,1fr);
+  min-height:100vh;
+}
+.app-sidebar{
+  position:sticky;top:0;height:100vh;background:#ffffff;
+  display:flex;flex-direction:column;overflow:hidden;z-index:100;
+  border-right:1px solid #e2e8f0;
+}
+.app-main{min-width:0;display:flex;flex-direction:column;min-height:100vh}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:150}
+
+/* LEFT PANEL */
+.sb-top-dark{
+  background:#1e293b;color:#fff;padding:12px 14px;flex:none;
+}
+.sb-brand-row{
+  display:flex;align-items:center;gap:10px;padding-bottom:10px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.sb-brand-logo{
+  width:28px;height:28px;border-radius:6px;flex:none;
+  background:#00CEA0;display:grid;place-items:center;color:#fff;font-size:12px;
+}
+.sb-brand-text{line-height:1.2;min-width:0}
+.sb-brand-text b{font-size:13px;font-weight:700;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-brand-text small{font-size:9.5px;color:#94a3b8;display:block}
+
+.sb-user-card{
+  display:flex;align-items:center;gap:9px;padding-top:9px;
+}
+.sb-user-avatar{
+  width:26px;height:26px;border-radius:6px;background:rgba(0,206,160,.2);
+  color:#00CEA0;display:grid;place-items:center;font-size:11px;flex:none;
+}
+.sb-user-info{line-height:1.2;min-width:0}
+.sb-user-info b{font-size:11.5px;display:block;color:#f1f5f9;font-weight:600}
+.sb-user-info small{font-size:9.5px;color:#64748b}
+
+.sb-scan-area{padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;flex:none}
+.sb-scan-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:7px 10px;border-radius:6px;border:none;cursor:pointer;
+  background:#00CEA0;color:#fff;font-size:12px;font-weight:700;transition:.15s;
+}
+.sb-scan-btn:hover{background:#00b88e}
+.sb-scan-btn:disabled{opacity:.6;cursor:not-allowed}
+.sb-scan-progress{margin-top:6px;display:none}
+.sb-scan-progress.show{display:block}
+.sb-scan-progress .bar-track{height:3px;border-radius:10px;background:#e2e8f0;overflow:hidden}
+.sb-scan-progress .bar-fill{height:100%;width:0;background:#00CEA0;transition:width .35s}
+.sb-scan-progress .bar-label{display:flex;justify-content:space-between;margin-top:3px;font-size:9.5px;color:#64748b}
+
+/* White Sidebar Nav Menu */
+.sb-nav{flex:1;overflow-y:auto;padding:8px 6px 14px;background:#ffffff}
+.sb-group-lbl{
+  padding:10px 10px 4px;font-size:9px;font-weight:700;color:#94a3b8;
+  letter-spacing:.8px;text-transform:uppercase;
+}
+.sb-item{
+  width:100%;display:flex;align-items:center;gap:9px;
+  padding:7px 10px;border-radius:6px;border:none;background:transparent;
+  color:#475569;font-size:12px;font-weight:600;text-align:left;cursor:pointer;
+  transition:all .15s;margin-bottom:2px;
+}
+.sb-item:hover{background:#f1f5f9;color:#0f172a}
+.sb-item.active{
+  background:#e6fbf6;color:#00a884;font-weight:700;
+}
+.sb-icon-box{
+  width:22px;height:22px;border-radius:5px;flex:none;
+  display:grid;place-items:center;font-size:10px;color:#fff;
+}
+.sb-item.active .sb-icon-box{box-shadow:0 2px 5px rgba(0,0,0,.15)}
+.ic-cyan   {background:#00bcd4}
+.ic-green  {background:#22c55e}
+.ic-red    {background:#ef4444}
+.ic-blue   {background:#3b82f6}
+.ic-orange {background:#f97316}
+.ic-slate  {background:#64748b}
+.ic-teal   {background:#00CEA0}
+
+.sb-item-text{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-pill-count{
+  font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:100px;
+  background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;
+}
+.sb-item.active .sb-pill-count{
+  background:#00CEA0;color:#fff;border-color:#00CEA0;
+}
+
+.sb-bottom-bar{
+  flex:none;padding:9px 12px;border-top:1px solid #e2e8f0;
+  background:#f8fafc;font-size:10.5px;color:#64748b;display:flex;align-items:center;gap:6px;
+}
+
+/* HEADER */
+.app-header{
+  height:var(--hdr-h);background:#fff;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;padding:0 20px;
+  position:sticky;top:0;z-index:60;
+}
+.hdr-hamburger{
+  display:none;width:32px;height:32px;border-radius:6px;border:1px solid var(--border);
+  background:#f8fafc;color:var(--heading);align-items:center;justify-content:center;cursor:pointer;
+}
+.hdr-title{min-width:0;line-height:1.2}
+.hdr-title h1{font-size:14.5px;font-weight:700;margin:0;letter-spacing:-.2px}
+.hdr-title p{font-size:11px;color:var(--muted);margin:1px 0 0}
+.hdr-actions{margin-left:auto;display:flex;align-items:center;gap:7px}
+.hdr-btn{
+  width:32px;height:32px;border-radius:6px;border:1px solid var(--border);
+  background:#f8fafc;color:var(--text-2);display:grid;place-items:center;font-size:12px;
+  cursor:pointer;transition:.15s;
+}
+.hdr-btn:hover{background:var(--brand-l);color:var(--brand);border-color:var(--brand)}
+.hdr-status{
+  width:32px;height:32px;border-radius:6px;border:1px solid var(--border);
+  background:#f8fafc;display:grid;place-items:center;font-size:12px;cursor:pointer;
+}
+.hdr-status.online{color:var(--ok);background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3)}
+.hdr-status.warn{color:var(--warn);background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3)}
+.hdr-status.offline{color:var(--danger);background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3)}
+
+/* CONTENT */
+.app-content{flex:1;padding:14px 18px 24px;max-width:100%}
+.view{display:none}
+.view.active{display:block}
+
+/* 6 SOLID COLOR CARDS */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:12px;
+  margin-bottom:14px;
+}
+.stat-card{
+  border-radius:6px;
+  padding:12px 16px;
+  color:#fff;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition:all .18s ease;
+  box-shadow:0 2px 4px rgba(0,0,0,.06);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-height:92px;
+}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 6px 14px -3px rgba(0,0,0,.18)}
+.stat-card.active{outline:3px solid rgba(15,23,42,.35)}
+
+.bg-cyan   {background:#00bcd4}
+.bg-green  {background:#22c55e}
+.bg-red    {background:#ef4444}
+.bg-blue   {background:#3b82f6}
+.bg-orange {background:#f97316}
+.bg-slate  {background:#64748b}
+
+.stat-header{display:flex;justify-content:space-between;align-items:flex-start;z-index:2}
+.stat-info{line-height:1.15}
+.stat-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.92}
+.stat-num{font-size:26px;font-weight:800;letter-spacing:-.8px;margin-top:3px}
+.stat-icon-watermark{
+  font-size:42px;opacity:.22;position:absolute;right:12px;top:50%;
+  transform:translateY(-50%);pointer-events:none;
+}
+.stat-footer{
+  display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:600;
+  opacity:.95;border-top:1px solid rgba(255,255,255,.25);padding-top:5px;margin-top:5px;z-index:2;
+}
+
+/* DATA TABLE CARD */
+.table-card{
+  background:#fff;border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden;
+}
+.table-toolbar{
+  padding:11px 16px;background:#fff;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+}
+.toolbar-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search-input-box{position:relative;display:flex;align-items:center}
+.search-input-box i{position:absolute;left:10px;color:var(--muted);font-size:12px}
+.search-input{
+  padding:6.5px 10px 6.5px 28px;border:1px solid var(--border);
+  border-radius:6px;font-size:12.5px;outline:none;width:210px;transition:.15s;
+}
+.search-input:focus{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-s)}
+
+.tab-pill-box{display:inline-flex;background:#f1f5f9;padding:2.5px;border-radius:7px}
+.tab-pill{
+  border:none;background:transparent;padding:5px 11px;border-radius:5px;
+  font-size:11.5px;font-weight:600;color:var(--text-2);cursor:pointer;transition:.15s;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.tab-pill.active{background:#fff;color:var(--heading);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+.table-container{max-height:calc(100vh - 365px);min-height:220px;overflow-y:auto}
+.cust-table{width:100%;border-collapse:collapse;text-align:left;font-size:12px}
+.cust-table th{
+  position:sticky;top:0;background:#f8fafc;color:#64748b;font-weight:700;
+  font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:9px 12px;
+  border-bottom:1px solid var(--border);z-index:10;
+}
+.cust-table td{padding:8.5px 12px;border-bottom:1px solid var(--border-2);vertical-align:middle}
+.cust-table tr:hover td{background:#f8fafc}
+.cust-table tr.selected td{background:rgba(0,206,160,.06)}
+
+.cell-chk{width:36px;text-align:center}
+.chk-box{width:16px;height:16px;accent-color:var(--brand);cursor:pointer}
+.sl-badge{font-weight:700;color:#64748b;font-size:11.5px}
+.cust-name{font-weight:700;color:var(--heading);font-size:12.5px}
+.cust-id{
+  font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:4px;
+  background:var(--brand-l);color:var(--brand-d);margin-left:6px;
+}
+.cust-meta{color:var(--muted);font-size:11px;margin-top:1px}
+
+.status-pill{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 9px;
+  border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.3px;border:1px solid transparent;
+}
+.status-pill.online{background:#ecfdf5;color:#059669;border-color:#a7f3d0}
+.status-pill.offline{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+.status-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+.btn-sm{
+  padding:4px 9px;border-radius:5px;font-size:11.5px;font-weight:600;
+  border:1px solid var(--border);background:#fff;color:var(--text-2);cursor:pointer;
+}
+.btn-sm:hover{background:var(--brand-l);color:var(--brand);border-color:var(--brand)}
+.btn-action-green{color:#059669;background:#ecfdf5;border-color:#a7f3d0}
+.btn-action-green:hover{background:#d1fae5}
+
+.table-footer{
+  padding:10px 16px;background:#fff;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+}
+.btn-primary-lg{
+  background:linear-gradient(135deg,#00CEA0,#00a884);color:#fff;border:none;
+  padding:7px 16px;border-radius:6px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;font-size:12.5px;
+}
+.btn-primary-lg:disabled{opacity:.5;cursor:not-allowed}
+
+/* History log */
+.log-list{padding:6px 16px;max-height:calc(100vh - 280px);overflow-y:auto}
+.log-item{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px dashed var(--border)}
+.log-icon{width:30px;height:30px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:11.5px;background:#dcfce7;color:#16a34a}
+.log-body{flex:1;min-width:0}
+
+/* Modals */
+.modal-overlay{
+  position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;
+  padding:16px;background:rgba(15,23,42,.6);backdrop-filter:blur(3px);
+}
+.modal-overlay.show{display:flex}
+.modal-card{width:100%;max-width:500px;background:#fff;border-radius:10px;box-shadow:0 20px 50px rgba(0,0,0,.3);overflow:hidden}
+.modal-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#f8fafc}
+.modal-title{font-size:14px;font-weight:700}
+.modal-body{padding:16px 18px}
+.modal-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;background:#f8fafc}
+.msg-area{width:100%;border-radius:7px;border:1px solid var(--border);padding:10px;font-size:12.5px;outline:none;resize:vertical}
+.msg-area:focus{border-color:var(--brand)}
+
+/* PIN */
+#pinOverlay{
+  position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:#0f172a;
+}
+#pinOverlay.hide{display:none}
+.pin-card{width:100%;max-width:320px;background:#fff;border-radius:10px;padding:24px 20px;text-align:center}
+.pin-logo{
+  width:50px;height:50px;margin:0 auto 12px;border-radius:10px;
+  background:linear-gradient(135deg,#00CEA0,#00a884);
+  display:grid;place-items:center;color:#fff;font-size:20px;
+}
+.pin-input{
+  width:100%;padding:10px;text-align:center;font-size:18px;font-weight:800;letter-spacing:6px;
+  border-radius:7px;border:1px solid var(--border);background:#f8fafc;outline:none;
+}
+.pin-btn{
+  width:100%;margin-top:10px;padding:9px;border-radius:7px;border:none;
+  background:linear-gradient(135deg,#00CEA0,#00a884);color:#fff;font-weight:700;cursor:pointer;
+}
+
+/* Toast */
+#toastBox{position:fixed;top:60px;right:18px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast-card{
+  padding:8.5px 14px;border-radius:6px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.15);
+  border-left:4px solid var(--brand);font-size:12px;font-weight:600;pointer-events:auto;
+}
+.toast-card.err{border-left-color:var(--danger)}
+.toast-card.info{border-left-color:var(--info)}
+
+/* RESPONSIVE */
+@media (max-width:767.98px){
+  .app-layout{grid-template-columns:1fr}
+  .app-sidebar{
+    position:fixed;top:0;left:0;bottom:0;width:250px;
+    transform:translateX(-100%);transition:transform .24s ease;z-index:200;
+  }
+  body.sidebar-open .app-sidebar{transform:translateX(0)}
+  body.sidebar-open .sb-overlay{display:block}
+  .hdr-hamburger{display:flex}
+  .app-content{padding:10px}
+  .stats-grid{grid-template-columns:repeat(2, minmax(0, 1fr));gap:8px}
+  .stat-card{padding:10px 12px;min-height:85px}
+  .stat-num{font-size:21px}
+  .search-input{width:100%}
+  .table-toolbar{flex-direction:column;align-items:stretch}
+}
+@media (max-width:400px){
+  .stats-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- PIN LOCK -->
+<div id="pinOverlay">
+  <div class="pin-card">
+    <div class="pin-logo"><i class="fas fa-network-wired"></i></div>
+    <h2 style="font-size:16px;margin-bottom:4px">Meherpur Internet</h2>
+    <p style="font-size:11.5px;color:var(--muted);margin-bottom:14px">Enter security PIN</p>
+    <input type="password" id="pinInput" inputmode="numeric" maxlength="8" class="pin-input" placeholder="••••" autocomplete="off">
+    <button class="pin-btn" onclick="verifyPin()">Unlock</button>
+    <div id="pinErr" style="color:var(--danger);font-size:11.5px;margin-top:8px;display:none;font-weight:600">Incorrect PIN</div>
+  </div>
+</div>
+
+<div class="app-layout">
+
+  <!-- LEFT PANEL -->
+  <aside class="app-sidebar" id="appSidebar">
+    <div class="sb-top-dark">
+      <div class="sb-brand-row">
+        <div class="sb-brand-logo"><i class="fas fa-network-wired"></i></div>
+        <div class="sb-brand-text">
+          <b>Meherpur Internet</b>
+          <small>Network Admin Console</small>
+        </div>
+      </div>
+      <div class="sb-user-card">
+        <div class="sb-user-avatar"><i class="fas fa-user-shield"></i></div>
+        <div class="sb-user-info">
+          <b id="opStatusText">Operator Console</b>
+          <small id="opSubText">Connecting bridge...</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-scan-area">
+      <button class="sb-scan-btn" id="sideScanBtn">
+        <i class="fas fa-bolt"></i> Scan Customers
+      </button>
+      <div class="sb-scan-progress" id="scanProgressBox">
+        <div class="bar-track"><div class="bar-fill" id="scanBar"></div></div>
+        <div class="bar-label">
+          <span><i class="fas fa-circle-notch fa-spin"></i> <span id="scanStatusText">Scanning...</span></span>
+          <span id="scanPctText">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-group-lbl">Status Filters</div>
+
+      <button class="sb-item active" data-nav="all-3days">
+        <div class="sb-icon-box ic-cyan"><i class="fas fa-list-ul"></i></div>
+        <span class="sb-item-text">All Within 3 Days</span>
+        <span class="sb-pill-count" id="sideCntAll">0</span>
+      </button>
+
+      <button class="sb-item" data-nav="3days">
+        <div class="sb-icon-box ic-green"><i class="fas fa-circle-check"></i></div>
+        <span class="sb-item-text">3 Days Later</span>
+        <span class="sb-pill-count" id="sideCnt3">0</span>
+      </button>
+
+      <button class="sb-item" data-nav="tomorrow">
+        <div class="sb-icon-box ic-red"><i class="fas fa-circle-xmark"></i></div>
+        <span class="sb-item-text">Tomorrow</span>
+        <span class="sb-pill-count" id="sideCnt1">0</span>
+      </button>
+
+      <button class="sb-item" data-nav="today">
+        <div class="sb-icon-box ic-blue"><i class="fas fa-sitemap"></i></div>
+        <span class="sb-item-text">Today</span>
+        <span class="sb-pill-count" id="sideCnt0">0</span>
+      </button>
+
+      <button class="sb-item" data-nav="expired">
+        <div class="sb-icon-box ic-orange"><i class="fas fa-network-wired"></i></div>
+        <span class="sb-item-text">Already Expired</span>
+        <span class="sb-pill-count" id="sideCntExp">0</span>
+      </button>
+
+      <div class="sb-group-lbl">Messaging</div>
+
+      <button class="sb-item" data-nav="not-sent-today">
+        <div class="sb-icon-box ic-slate"><i class="fas fa-clock"></i></div>
+        <span class="sb-item-text">Pending Reminders</span>
+        <span class="sb-pill-count" id="sideCntUnsent">0</span>
+      </button>
+
+      <button class="sb-item" data-nav="sent-today">
+        <div class="sb-icon-box ic-teal"><i class="fas fa-paper-plane"></i></div>
+        <span class="sb-item-text">Sent Today</span>
+        <span class="sb-pill-count" id="sideCntSent">0</span>
+      </button>
+
+      <div class="sb-group-lbl">Logs</div>
+
+      <button class="sb-item" data-nav="history">
+        <div class="sb-icon-box ic-slate"><i class="fas fa-clock-rotate-left"></i></div>
+        <span class="sb-item-text">Message History</span>
+        <span class="sb-pill-count" id="tabLogCnt">0</span>
+      </button>
+    </nav>
+
+    <div class="sb-bottom-bar">
+      <i class="fas fa-clock" style="color:#00CEA0;font-size:11px"></i>
+      <span id="stripLastScan" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Waiting for scan...</span>
+    </div>
+  </aside>
+
+  <div class="sb-overlay" id="sbOverlay"></div>
+
+  <!-- RIGHT MAIN PANEL -->
+  <div class="app-main">
+    <header class="app-header">
+      <button class="hdr-hamburger" id="mobileToggle"><i class="fas fa-bars"></i></button>
+      <div class="hdr-title">
+        <h1 id="pageTitle">All Customers (Within 3 Days)</h1>
+        <p id="pageSub">Customers expiring in Today, Tomorrow and 3 Days</p>
+      </div>
+      <div class="hdr-actions">
+        <button class="hdr-status online" id="statusPill" title="WhatsApp Bridge URL (Click to Connect/Configure)">
+          <i class="fab fa-whatsapp"></i>
+        </button>
+        <button class="hdr-btn" id="refreshBtn" title="Refresh"><i class="fas fa-rotate"></i></button>
+      </div>
+    </header>
+
+    <div class="app-content">
+
+      <!-- 6 SOLID COLOR CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card bg-cyan active" data-nav="all-3days">
+          <div class="stat-header">
+            <div class="stat-info">
+              <div class="stat-lbl">1. All Within 3 Days</div>
+              <div class="stat-num" id="mAllTotal">0</div>
+            </div>
+            <i class="fas fa-list-ul stat-icon-watermark"></i>
+          </div>
+          <div class="stat-footer">
+            <span>WA: <b id="mAllWa">0</b></span> | <span>Non-WA: <b id="mAllNoWa">0</b></span>
+          </div>
+        </div>
+
+        <div class="stat-card bg-green" data-nav="3days">
+          <div class="stat-header">
+            <div class="stat-info">
+              <div class="stat-lbl">2. 3 Days Later</div>
+              <div class="stat-num" id="m3Total">0</div>
+            </div>
+            <i class="fas fa-circle-check stat-icon-watermark"></i>
+          </div>
+          <div class="stat-footer">
+            <span>WA: <b id="m3Wa">0</b></span> | <span>Non-WA: <b id="m3NoWa">0</b></span>
+          </div>
+        </div>
+
+        <div class="stat-card bg-red" data-nav="tomorrow">
+          <div class="stat-header">
+            <div class="stat-info">
+              <div class="stat-lbl">3. Tomorrow</div>
+              <div class="stat-num" id="m1Total">0</div>
+            </div>
+            <i class="fas fa-circle-xmark stat-icon-watermark"></i>
+          </div>
+          <div class="stat-footer">
+            <span>WA: <b id="m1Wa">0</b></span> | <span>Non-WA: <b id="m1NoWa">0</b></span>
+          </div>
+        </div>
+
+        <div class="stat-card bg-blue" data-nav="today">
+          <div class="stat-header">
+            <div class="stat-info">
+              <div class="stat-lbl">4. Today</div>
+              <div class="stat-num" id="m0Total">0</div>
+            </div>
+            <i class="fas fa-sitemap stat-icon-watermark"></i>
+          </div>
+          <div class="stat-footer">
+            <span>WA: <b id="m0Wa">0</b></span> | <span>Non-WA: <b id="m0NoWa">0</b></span>
+          </div>
+        </div>
+
+        <div class="stat-card bg-orange" data-nav="expired">
+          <div class="stat-header">
+            <div class="stat-info">
+              <div class="stat-lbl">5. Expired</div>
+              <div class="stat-num" id="mExpTotal">0</div>
+            </div>
+            <i class="fas fa-network-wired stat-icon-watermark"></i>
+          </div>
+          <div class="stat-footer">
+            <span>WA: <b id="mExpWa">0</b></span> | <span>Non-WA: <b id="mExpNoWa">0</b></span>
+          </div>
+        </div>
+
+        <div class="stat-card bg-slate" data-nav="not-sent-today">
+          <div class="stat-header">
+            <div class="stat-info">
+              <div class="stat-lbl">6. Pending</div>
+              <div class="stat-num" id="mUnsentTotal">0</div>
+            </div>
+            <i class="fas fa-user-slash stat-icon-watermark"></i>
+          </div>
+          <div class="stat-footer">
+            <span>WA: <b id="mUnsentWa">0</b></span> | <span>Non-WA: <b id="mUnsentNoWa">0</b></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: CUSTOMERS TABLE -->
+      <section class="view active" data-view="customers">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="toolbar-left">
+              <div class="search-input-box">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="filterInput" class="search-input" placeholder="Search by name, ID, phone...">
+              </div>
+              <div class="tab-pill-box" id="tabPillBox">
+                <button class="tab-pill active" data-tab="wa"><i class="fab fa-whatsapp"></i> WhatsApp (<span id="tabWaCnt">0</span>)</button>
+                <button class="tab-pill" data-tab="nowa"><i class="fas fa-phone-slash"></i> Non-WA (<span id="tabNoWaCnt">0</span>)</button>
+              </div>
+            </div>
+            <div>
+              <span style="font-size:12px;color:var(--muted)">Showing <b id="visibleCount" style="color:var(--heading)">0</b> entries</span>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="cust-table">
+              <thead>
+                <tr>
+                  <th class="cell-chk" id="thChk"><input type="checkbox" id="selectAllChk" class="chk-box"></th>
+                  <th style="width:48px">SL</th>
+                  <th>Customer Info</th>
+                  <th>Phone &amp; Expiry</th>
+                  <th>Status</th>
+                  <th style="text-align:right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="table-footer" id="tableFooter">
+            <div style="font-size:12.5px;color:var(--text-2);display:flex;align-items:center;gap:6px">
+              <i class="fas fa-user-check" style="color:var(--brand)"></i> Selected: <b id="selCountBtn" style="color:var(--brand-d)">0</b>
+            </div>
+            <button class="btn-primary-lg" id="mainSendBtn" disabled>
+              <i class="fab fa-whatsapp"></i> Send WhatsApp Reminders
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: HISTORY -->
+      <section class="view" data-view="history">
+        <div class="table-card">
+          <div class="table-toolbar">
+            <b>Dispatched Messages Log</b>
+            <div>
+              <button class="btn-sm" id="clearLogBtn"><i class="fas fa-trash"></i> Clear</button>
+              <button class="btn-sm" id="exportLogBtn"><i class="fas fa-download"></i> Export CSV</button>
+            </div>
+          </div>
+          <div class="log-list" id="listLog"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRM SEND -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Confirm Dispatch</div>
+      <button class="btn-sm" data-close><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="resendWarning" style="display:none;background:#fffbeb;border:1px solid #fde68a;padding:10px;border-radius:6px;font-size:12px;color:#92400e;margin-bottom:12px">
+        <i class="fas fa-triangle-exclamation"></i> Some selected customers have already received reminders today.
+      </div>
+      <label style="font-size:11.5px;font-weight:700;display:block;margin-bottom:6px">Message Content Preview</label>
+      <textarea id="confirmMessage" class="msg-area" rows="6"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-sm" data-close>Cancel</button>
+      <button class="btn-primary-lg" id="confirmSendBtn"><i class="fab fa-whatsapp"></i> Send Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDIT MESSAGE -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Customize Customer Message</div>
+      <button class="btn-sm" data-close><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:10px" id="editCustomerInfo">—</div>
+      <textarea id="editMsgArea" class="msg-area" rows="6"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-sm" data-close>Cancel</button>
+      <button class="btn-primary-lg" id="editSaveBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastBox"></div>
+
+<script>
+/* =====================================================================
+   CONFIG (DEFAULT CLOUDFLARE TUNNEL SET HERE)
+   ===================================================================== */
+const ACCESS_PIN     = "1234";
+const DEFAULT_TUNNEL = "https://behavioral-copy-article-corp.trycloudflare.com";
+const LOCAL_API      = "http://127.0.0.1:5001";
+const SYNC_CHANNEL   = "mhpi_isp_tunnel_sync_8842";
+const LOG_KEY        = "mhpi_sms_log_v1";
+
+/* STATE */
+let API_BASE       = localStorage.getItem("mhpi_custom_api") || DEFAULT_TUNNEL;
+let serverOnline   = false;
+let waConnected    = false;
+let allResults     = [];
+let selectedIds    = new Set();
+let customMessages = {};
+let activeTab         = "wa";
+let currentNav        = "all-3days";
+let pendingSendIds    = [];
+let editingId         = null;
+let searchQuery       = "";
+
+let smsLog = [];
+try { smsLog = JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); } catch(e){ smsLog = []; }
+
+const $ = id => document.getElementById(id);
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function onlyDigits(s){ return String(s||"").replace(/[^\d+]/g,""); }
+function isTarget3Days(d){ return d === 0 || d === 1 || d === 3; }
+
+function toast(msg, type="ok"){
+  const el = document.createElement("div");
+  el.className = "toast-card " + type;
+  el.innerText = msg;
+  $("toastBox").appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
+
+function copyText(txt, label="Copied!"){
+  navigator.clipboard.writeText(txt).then(() => toast(label));
+}
+
+function startOfToday(){
+  const d = new Date(); d.setHours(0,0,0,0); return d;
+}
+function getTodaySentMap(){
+  const start = startOfToday();
+  const map = new Map();
+  smsLog.forEach(l => {
+    if (new Date(l.time) >= start && !map.has(l.idname)) map.set(l.idname, l);
+  });
+  return map;
+}
+
+/* PIN */
+(function initPin(){
+  if (localStorage.getItem("mhpi_pin_ok") === ACCESS_PIN) {
+    $("pinOverlay").classList.add("hide");
+  } else {
+    setTimeout(() => $("pinInput").focus(), 200);
+  }
+})();
+function verifyPin(){
+  if ($("pinInput").value.trim() === ACCESS_PIN) {
+    localStorage.setItem("mhpi_pin_ok", ACCESS_PIN);
+    $("pinOverlay").classList.add("hide");
+  } else {
+    $("pinErr").style.display = "block";
+    $("pinInput").value = "";
+  }
+}
+$("pinInput").addEventListener("keydown", e => { if (e.key === "Enter") verifyPin(); });
+
+/* NAVIGATION */
+const NAV_META = {
+  'all-3days':      { title: 'All Customers (Within 3 Days)', sub: 'Expiring Today, Tomorrow and 3 Days later' },
+  '3days':          { title: '3 Days Later Expiring', sub: 'Expiring in exactly 3 days' },
+  'tomorrow':       { title: 'Expiring Tomorrow', sub: 'Expiring on tomorrow' },
+  'today':          { title: 'Expiring Today', sub: 'Expiring today' },
+  'expired':        { title: 'Already Expired', sub: 'Passed expiration date' },
+  'not-sent-today': { title: 'Pending Reminders', sub: 'Awaiting reminder dispatch' },
+  'sent-today':     { title: 'Sent Today', sub: 'Reminders successfully dispatched today' },
+  'history':        { title: 'Dispatched Message Log', sub: 'Complete transmission history' }
+};
+
+function navigateTo(key){
+  if (!NAV_META[key]) return;
+  currentNav = key;
+
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  const link = document.querySelector(`.sb-item[data-nav="${key}"]`);
+  if (link) link.classList.add('active');
+
+  document.querySelectorAll('.stat-card').forEach(b => b.classList.remove('active'));
+  const card = document.querySelector(`.stat-card[data-nav="${key}"]`);
+  if (card) card.classList.add('active');
+
+  $("pageTitle").innerText = NAV_META[key].title;
+  $("pageSub").innerText = NAV_META[key].sub;
+
+  const view = (key === 'history') ? 'history' : 'customers';
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelector(`.view[data-view="${view}"]`).classList.add('active');
+
+  if (key === 'expired' || key === 'sent-today') selectedIds.clear();
+
+  if (view === 'customers') renderTable();
+  else renderLog();
+
+  document.body.classList.remove("sidebar-open");
+}
+
+document.querySelectorAll('[data-nav]').forEach(el => {
+  el.addEventListener('click', () => navigateTo(el.dataset.nav));
+});
+
+/* FILTER USERS */
+function getCategoryUsers(){
+  let list = [];
+  const sentMap = getTodaySentMap();
+  if (currentNav === 'all-3days')    list = allResults.filter(u => isTarget3Days(u.days_left));
+  else if (currentNav === '3days')   list = allResults.filter(u => u.days_left === 3);
+  else if (currentNav === 'tomorrow')list = allResults.filter(u => u.days_left === 1);
+  else if (currentNav === 'today')   list = allResults.filter(u => u.days_left === 0);
+  else if (currentNav === 'expired') list = allResults.filter(u => u.days_left < 0);
+  else if (currentNav === 'sent-today') list = allResults.filter(u => u.sent || sentMap.has(u.idname));
+  else if (currentNav === 'not-sent-today') list = allResults.filter(u => !u.sent && !sentMap.has(u.idname) && isTarget3Days(u.days_left));
+
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(u => (u.name||"").toLowerCase().includes(q) || (u.idname||"").toLowerCase().includes(q) || (u.local_phone||"").includes(q));
+  }
+  return list;
+}
+
+function calcBreakdown(list){
+  const total = list.length;
+  const wa = list.filter(u => u.has_wa).length;
+  return { total, wa, nowa: total - wa };
+}
+
+function renderStats(){
+  const sentMap = getTodaySentMap();
+  const sAll = calcBreakdown(allResults.filter(u => isTarget3Days(u.days_left)));
+  const s3 = calcBreakdown(allResults.filter(u => u.days_left === 3));
+  const s1 = calcBreakdown(allResults.filter(u => u.days_left === 1));
+  const s0 = calcBreakdown(allResults.filter(u => u.days_left === 0));
+  const sExp = calcBreakdown(allResults.filter(u => u.days_left < 0));
+  const sUnsent = calcBreakdown(allResults.filter(u => !u.sent && !sentMap.has(u.idname) && isTarget3Days(u.days_left)));
+  const sentCount = allResults.filter(u => u.sent || sentMap.has(u.idname)).length;
+
+  $("mAllTotal").innerText = sAll.total; $("mAllWa").innerText = sAll.wa; $("mAllNoWa").innerText = sAll.nowa;
+  $("m3Total").innerText = s3.total; $("m3Wa").innerText = s3.wa; $("m3NoWa").innerText = s3.nowa;
+  $("m1Total").innerText = s1.total; $("m1Wa").innerText = s1.wa; $("m1NoWa").innerText = s1.nowa;
+  $("m0Total").innerText = s0.total; $("m0Wa").innerText = s0.wa; $("m0NoWa").innerText = s0.nowa;
+  $("mExpTotal").innerText = sExp.total; $("mExpWa").innerText = sExp.wa; $("mExpNoWa").innerText = sExp.nowa;
+  $("mUnsentTotal").innerText = sUnsent.total; $("mUnsentWa").innerText = sUnsent.wa; $("mUnsentNoWa").innerText = sUnsent.nowa;
+
+  $("sideCntAll").innerText = sAll.total;
+  $("sideCnt3").innerText = s3.total;
+  $("sideCnt1").innerText = s1.total;
+  $("sideCnt0").innerText = s0.total;
+  $("sideCntExp").innerText = sExp.total;
+  $("sideCntUnsent").innerText = sUnsent.total;
+  $("sideCntSent").innerText = sentCount;
+  $("tabLogCnt").innerText = smsLog.length;
+}
+
+/* RENDER TABLE */
+function renderTable(){
+  const users = getCategoryUsers();
+  const readonly = (currentNav === 'expired' || currentNav === 'sent-today');
+  
+  $("thChk").style.display = readonly ? "none" : "";
+  $("tableFooter").style.display = readonly ? "none" : "flex";
+
+  const waList = users.filter(u => u.has_wa);
+  const noWaList = users.filter(u => !u.has_wa);
+  $("tabWaCnt").innerText = waList.length;
+  $("tabNoWaCnt").innerText = noWaList.length;
+
+  const current = (activeTab === 'wa') ? waList : noWaList;
+  $("visibleCount").innerText = current.length;
+
+  const tbody = $("tableBody");
+  if (!current.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--muted)">No customers found in this view.</td></tr>`;
+    updateSelectionUI();
+    return;
+  }
+
+  const sentMap = getTodaySentMap();
+
+  tbody.innerHTML = current.map((u, idx) => {
+    const sl = idx + 1;
+    const isSent = u.sent || sentMap.has(u.idname);
+    const sel = selectedIds.has(u.idname);
+    const safeAttr = esc(u.idname);
+    const ph = onlyDigits(u.local_phone);
+
+    return `
+      <tr class="${sel?'selected':''}" data-id="${safeAttr}">
+        ${!readonly ? `<td class="cell-chk"><input type="checkbox" class="chk-box" ${sel?'checked':''} data-role="chk"></td>` : ''}
+        <td><span class="sl-badge">${sl}</span></td>
+        <td>
+          <div class="cust-name">${esc(u.name)} <span class="cust-id">${esc(u.idname)}</span></div>
+          <div class="cust-meta">${u.after_4pm ? '<span style="color:#d97706">After 4 PM</span> • ' : ''}${esc(u.day_label)}</div>
+        </td>
+        <td>
+          <div style="font-weight:600;color:var(--heading)">${esc(u.local_phone)}</div>
+          <div class="cust-meta"><i class="far fa-calendar"></i> ${esc(u.expire_date)}</div>
+        </td>
+        <td>
+          <span class="status-pill ${isSent?'online':'offline'}">
+            <span class="status-dot"></span> ${isSent?'DELIVERED':'PENDING'}
+          </span>
+        </td>
+        <td style="text-align:right">
+          ${activeTab === 'wa' ? `
+            <button class="btn-sm" data-act="preview" title="Edit"><i class="fas fa-pen"></i></button>
+            <button class="btn-sm btn-action-green" data-act="sendone" title="Send WhatsApp"><i class="fab fa-whatsapp"></i></button>
+          ` : `
+            <a class="btn-sm" href="sms:${ph}?body=${encodeURIComponent(u.message||"")}" title="SMS"><i class="fas fa-comment-sms"></i></a>
+            <a class="btn-sm btn-action-green" href="tel:${ph}" title="Call"><i class="fas fa-phone"></i></a>
+          `}
+          <button class="btn-sm" data-act="copy" title="Copy"><i class="fas fa-copy"></i></button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  updateSelectionUI();
+}
+
+/* SELECTION */
+function updateSelectionUI(){
+  const count = selectedIds.size;
+  $("selCountBtn").innerText = count;
+  $("mainSendBtn").disabled = (count === 0);
+
+  const current = (activeTab === 'wa') ? getCategoryUsers().filter(u => u.has_wa) : [];
+  const chk = $("selectAllChk");
+  if (chk) {
+    const allSelected = current.length > 0 && current.every(u => selectedIds.has(u.idname));
+    chk.checked = allSelected;
+    chk.indeterminate = count > 0 && !allSelected;
+  }
+}
+
+$("selectAllChk").addEventListener("change", e => {
+  const current = (activeTab === 'wa') ? getCategoryUsers().filter(u => u.has_wa) : [];
+  if (e.target.checked) current.forEach(u => selectedIds.add(u.idname));
+  else current.forEach(u => selectedIds.delete(u.idname));
+  renderTable();
+});
+
+$("tableBody").addEventListener("change", e => {
+  if (e.target.dataset.role === "chk") {
+    const row = e.target.closest("tr");
+    const id = row.dataset.id;
+    if (e.target.checked) selectedIds.add(id);
+    else selectedIds.delete(id);
+    row.classList.toggle("selected", e.target.checked);
+    updateSelectionUI();
+  }
+});
+
+/* TABLE ROW ACTIONS */
+$("tableBody").addEventListener("click", e => {
+  const btn = e.target.closest("[data-act]");
+  if (!btn) return;
+  const row = btn.closest("tr");
+  const id = row.dataset.id;
+  const user = allResults.find(u => u.idname === id);
+  if (!user) return;
+  const act = btn.dataset.act;
+
+  if (act === "preview") {
+    editingId = id;
+    $("editCustomerInfo").innerText = `${user.name} (${user.idname}) — ${user.local_phone}`;
+    $("editMsgArea").value = customMessages[id] || user.message || "";
+    openModal("editModal");
+  } else if (act === "copy") {
+    copyText(user.local_phone, "Phone number copied!");
+  } else if (act === "sendone") {
+    openConfirmSend([id]);
+  }
+});
+
+/* MODALS */
+function openModal(id){ $(id).classList.add("show"); }
+function closeModal(id){ $(id).classList.remove("show"); }
+document.querySelectorAll("[data-close]").forEach(el => {
+  el.addEventListener("click", () => el.closest(".modal-overlay").classList.remove("show"));
+});
+
+$("editSaveBtn").addEventListener("click", () => {
+  if (editingId) {
+    customMessages[editingId] = $("editMsgArea").value;
+    toast("Message updated.");
+    closeModal("editModal");
+  }
+});
+
+function openConfirmSend(ids){
+  if (!ids.length) return;
+  pendingSendIds = ids;
+  const sentMap = getTodaySentMap();
+  const already = ids.filter(id => sentMap.has(id));
+  $("resendWarning").style.display = already.length ? "block" : "none";
+
+  if (ids.length === 1) {
+    const u = allResults.find(x => x.idname === ids[0]);
+    $("confirmMessage").value = customMessages[u.idname] || u.message || "";
+  } else {
+    $("confirmMessage").value = "Personalized reminders will be sent to all selected recipients.";
+  }
+  openModal("confirmModal");
+}
+
+$("mainSendBtn").addEventListener("click", () => {
+  openConfirmSend(Array.from(selectedIds));
+});
+
+$("confirmSendBtn").addEventListener("click", async () => {
+  if (!pendingSendIds.length) return;
+  const ids = pendingSendIds.slice();
+  if (ids.length === 1) customMessages[ids[0]] = $("confirmMessage").value;
+  closeModal("confirmModal");
+
+  ids.forEach(id => {
+    const u = allResults.find(x => x.idname === id);
+    if (u) addSmsLog(u, customMessages[id] || u.message || "", "whatsapp");
+  });
+
+  try {
+    await fetch(API_BASE + "/api/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids, custom_messages: customMessages })
+    });
+    toast(`Dispatching ${ids.length} reminder(s)...`);
+  } catch(e) {
+    toast("Failed to dispatch.", "err");
+  }
+});
+
+/* LOGS */
+function addSmsLog(user, message, channel){
+  smsLog.unshift({
+    id: Date.now() + Math.random(),
+    idname: user.idname,
+    name: user.name,
+    phone: user.local_phone,
+    message,
+    time: new Date().toISOString(),
+    channel
+  });
+  if (smsLog.length > 800) smsLog = smsLog.slice(0, 800);
+  try { localStorage.setItem(LOG_KEY, JSON.stringify(smsLog)); } catch(e){}
+  renderStats();
+  renderTable();
+}
+
+function renderLog(){
+  const box = $("listLog");
+  if (!smsLog.length) {
+    box.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted)">No messages dispatched yet.</div>`;
+    return;
+  }
+  box.innerHTML = smsLog.map((item, idx) => `
+    <div class="log-item">
+      <div class="log-icon"><i class="fab fa-whatsapp"></i></div>
+      <div class="log-body">
+        <div style="font-weight:700">${idx+1}. ${esc(item.name)} <span class="cust-id">${esc(item.idname)}</span></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Phone: ${esc(item.phone)} • ${new Date(item.time).toLocaleTimeString()}</div>
+        <div style="font-size:11.5px;color:var(--text-2);margin-top:4px">${esc(item.message)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+$("clearLogBtn").addEventListener("click", () => {
+  if (confirm("Clear all logs?")) {
+    smsLog = [];
+    localStorage.removeItem(LOG_KEY);
+    renderStats();
+    renderLog();
+    renderTable();
+  }
+});
+
+/* SEARCH & TABS */
+$("filterInput").addEventListener("input", e => {
+  searchQuery = e.target.value.trim();
+  renderTable();
+});
+
+document.querySelectorAll(".tab-pill").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-pill").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeTab = btn.dataset.tab;
+    renderTable();
+  });
+});
+
+$("mobileToggle").addEventListener("click", () => document.body.classList.toggle("sidebar-open"));
+$("sbOverlay").addEventListener("click", () => document.body.classList.remove("sidebar-open"));
+
+/* SMART AUTO-CONNECT WITH DEFAULT CLOUDFLARE TUNNEL */
+async function checkEndpoint(url){
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    const res = await fetch(url + "/api/state", { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (res.ok) return true;
+  } catch(e){}
+  return false;
+}
+
+async function syncTunnelUrl(){
+  // 1. Check Default Cloudflare Tunnel First
+  if (await checkEndpoint(DEFAULT_TUNNEL)) {
+    API_BASE = DEFAULT_TUNNEL;
+    return;
+  }
+
+  // 2. Check custom saved URL if any
+  const saved = localStorage.getItem("mhpi_custom_api");
+  if (saved && await checkEndpoint(saved)) {
+    API_BASE = saved;
+    return;
+  }
+
+  // 3. Check local Termux server (127.0.0.1:5001)
+  if (await checkEndpoint(LOCAL_API)) {
+    API_BASE = LOCAL_API;
+    return;
+  }
+
+  // 4. Fallback to ntfy.sh if tunnel URL changed
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 3000);
+    const res = await fetch("https://ntfy.sh/" + SYNC_CHANNEL + "/json?poll=1&since=48h", { signal: ctrl.signal });
+    clearTimeout(timer);
+    const text = await res.text();
+    const lines = text.trim().split("\n").filter(Boolean);
+    for (let i = lines.length - 1; i >= 0; i--) {
+      let obj; try { obj = JSON.parse(lines[i]); } catch(e){ continue; }
+      if (obj.event === "message" && typeof obj.message === "string") {
+        const msg = obj.message.trim();
+        if (msg.startsWith("http")) {
+          API_BASE = msg.replace(/\/+$/, "");
+          break;
+        }
+      }
+    }
+  } catch(e){}
+}
+
+async function pollState(){
+  if (!API_BASE) {
+    API_BASE = DEFAULT_TUNNEL;
+  }
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 3500);
+    const res = await fetch(API_BASE + "/api/state", { signal: ctrl.signal });
+    clearTimeout(timer);
+    const data = await res.json();
+
+    serverOnline = true;
+    waConnected = !!data.wa_connected;
+    $("statusPill").className = "hdr-status " + (waConnected ? "online" : "warn");
+    $("statusPill").innerHTML = waConnected ? '<i class="fab fa-whatsapp"></i>' : '<i class="fas fa-triangle-exclamation"></i>';
+    $("opStatusText").innerText = waConnected ? "WhatsApp Connected" : "WA Disconnected";
+    $("opSubText").innerText = data.scan_status || "Bridge Active";
+
+    if (data.last_scan_time) $("stripLastScan").innerText = "Last Scan: " + data.last_scan_time;
+
+    if (data.scanning) {
+      $("scanProgressBox").classList.add("show");
+      const pct = data.scan_total > 0 ? Math.round((data.scan_progress / data.scan_total) * 100) : 0;
+      $("scanBar").style.width = pct + "%";
+      $("scanPctText").innerText = pct + "%";
+      $("scanStatusText").innerText = data.scan_status || "Scanning...";
+      $("sideScanBtn").disabled = true;
+    } else {
+      $("scanProgressBox").classList.remove("show");
+      $("sideScanBtn").disabled = false;
+    }
+
+    if (Array.isArray(data.results)) {
+      allResults = data.results;
+      renderStats();
+      renderTable();
+    }
+  } catch(e){
+    serverOnline = false; waConnected = false;
+    $("statusPill").className = "hdr-status offline";
+    $("statusPill").innerHTML = '<i class="fab fa-whatsapp"></i>';
+    $("opStatusText").innerText = "Bridge Offline";
+    $("opSubText").innerText = "Click WA icon to reconnect";
+  }
+}
+
+/* WHATSAPP ON BUTTON: Pre-filled with https://behavioral-copy-article-corp.trycloudflare.com */
+$("statusPill").addEventListener("click", async () => {
+  const manual = prompt(
+    "WhatsApp Bridge Active URL (Default set to your Cloudflare Tunnel):",
+    API_BASE || DEFAULT_TUNNEL
+  );
+  if (manual !== null) {
+    const clean = manual.trim().replace(/\/+$/, "") || DEFAULT_TUNNEL;
+    localStorage.setItem("mhpi_custom_api", clean);
+    API_BASE = clean;
+    toast("Connecting to: " + API_BASE, "info");
+    await pollState();
+  }
+});
+
+$("sideScanBtn").addEventListener("click", async () => {
+  if (!serverOnline) {
+    API_BASE = localStorage.getItem("mhpi_custom_api") || DEFAULT_TUNNEL;
+    await pollState();
+  }
+  if (!serverOnline) return toast("Server bridge offline! Check Termux.", "err");
+  $("sideScanBtn").disabled = true;
+  try {
+    await fetch(API_BASE + "/api/scan?force=0", { method: "POST" });
+    toast("Scanning started.");
+  } catch(e){ toast("Scan failed.", "err"); }
+});
+
+$("refreshBtn").addEventListener("click", async () => {
+  await syncTunnelUrl();
+  await pollState();
+  toast("Refreshed.");
+});
+
+(async function boot(){
+  renderStats();
+  renderTable();
+  await pollState();
+  setInterval(syncTunnelUrl, 8000);
+  setInterval(pollState, 1500);
+})();
+</script>
+</body>
+</html>
