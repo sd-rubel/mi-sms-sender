@@ -4,9 +4,9 @@
   "scan_total": 822,
   "scan_status": "স্ক্যান সম্পন্ন! মোট 30 জন (WA আছে: 14, নেই: 16)",
   "sending": false,
-  "send_progress": 0,
-  "send_total": 0,
-  "send_status": "",
+  "send_progress": 1,
+  "send_total": 1,
+  "send_status": "✅ সম্পন্ন! 1 জন গ্রাহককে সফলভাবে মেসেজ পাঠানো হয়েছে।",
   "last_scan_time": "12:09 PM",
   "results": [
     {
@@ -66,7 +66,7 @@
       "has_wa": true,
       "jid": "8801955030003@s.whatsapp.net",
       "message": "আসসালামু আলাইকুম MD. TASIB ALI,\n\nআপনার ইন্টারনেট সংযোগের মেয়াদ আজ ২৮-০৯-২০২৬ বিকাল ৪:০০টায় শেষ হবে। সংযোগ চালু রাখতে অনুগ্রহ করে এর পূর্বেই বিল পরিশোধ করুন। আপনার ইউজার আইডি: MHPI-255\n\nঅনলাইন পেমেন্ট:\nhttps://ispbill.com/pay.php?c=1293&q=mhpi-255\n\nধন্যবাদান্তে,\nShamim Reza\nMeherpur Internet",
-      "sent": false,
+      "sent": true,
       "after_4pm": false
     },
     {
