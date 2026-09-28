@@ -25,15 +25,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Cache Node Modules
+        id: cache-npm
+        uses: actions/cache@v4
         with:
-          node-version: '20'
+          path: node_modules
+          key: ${{ runner.os }}-baileys-fast-v1
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      - name: Install Node Dependencies (Only if not cached)
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm install @whiskeysockets/baileys qrcode-terminal pino --no-audit --no-fund
 
       - name: Restore WhatsApp Session from Secret
         if: env.WA_SESSION_B64 != ''
@@ -41,14 +42,6 @@ jobs:
           WA_SESSION_B64: ${{ secrets.WA_SESSION_B64 }}
         run: |
           echo "$WA_SESSION_B64" | base64 -d | tar -xzf -
-
-      - name: Install Node Dependencies
-        run: |
-          if [ -f package.json ]; then
-            npm install
-          else
-            npm install @whiskeysockets/baileys qrcode-terminal pino
-          fi
 
       - name: Start WhatsApp Bridge & Run Task
         env:
@@ -65,4 +58,4 @@ jobs:
           git config --local user.name "github-actions[bot]"
           touch state.json smart_cache.json
           git add state.json smart_cache.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update state and cache [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git pull --rebase && git commit -m "Auto-update state and cache [skip ci]" && git push)
