@@ -376,14 +376,14 @@ h1,h2,h3,h4,h5,h6{margin:0;color:var(--heading);font-weight:700}
         <div class="sb-brand-logo"><i class="fas fa-network-wired"></i></div>
         <div class="sb-brand-text">
           <b>Meherpur Internet</b>
-          <small>Network Admin Console</small>
+          <small>GitHub Cloud Console</small>
         </div>
       </div>
       <div class="sb-user-card">
         <div class="sb-user-avatar"><i class="fas fa-user-shield"></i></div>
         <div class="sb-user-info">
-          <b id="opStatusText">Operator Console</b>
-          <small id="opSubText">Connecting bridge...</small>
+          <b id="opStatusText">Cloud Console</b>
+          <small id="opSubText">Checking status...</small>
         </div>
       </div>
     </div>
@@ -474,7 +474,7 @@ h1,h2,h3,h4,h5,h6{margin:0;color:var(--heading);font-weight:700}
         <p id="pageSub">Customers expiring in Today, Tomorrow and 3 Days</p>
       </div>
       <div class="hdr-actions">
-        <button class="hdr-status online" id="statusPill" title="WhatsApp Bridge URL (Click to Connect/Configure)">
+        <button class="hdr-status online" id="statusPill" title="Click to Set GitHub Token (PAT)">
           <i class="fab fa-whatsapp"></i>
         </button>
         <button class="hdr-btn" id="refreshBtn" title="Refresh"><i class="fas fa-rotate"></i></button>
@@ -671,26 +671,27 @@ h1,h2,h3,h4,h5,h6{margin:0;color:var(--heading);font-weight:700}
 
 <script>
 /* =====================================================================
-   CONFIG (DEFAULT CLOUDFLARE TUNNEL SET HERE)
+   CONFIG & GITHUB ACTIONS SERVERLESS ENGINE
    ===================================================================== */
-const ACCESS_PIN     = "1234";
-const DEFAULT_TUNNEL = "https://behavioral-copy-article-corp.trycloudflare.com";
-const LOCAL_API      = "http://127.0.0.1:5001";
-const SYNC_CHANNEL   = "mhpi_isp_tunnel_sync_8842";
-const LOG_KEY        = "mhpi_sms_log_v1";
+const ACCESS_PIN  = "1234";
+const LOG_KEY     = "mhpi_sms_log_v1";
+const GH_OWNER    = "sd-rubel";
+const GH_REPO     = "mi-sms-sender";
+const GH_WORKFLOW = "bot.yml";
+const GH_BRANCH   = "main";
 
 /* STATE */
-let API_BASE       = localStorage.getItem("mhpi_custom_api") || DEFAULT_TUNNEL;
+let ghToken        = localStorage.getItem("mhpi_gh_token") || "";
 let serverOnline   = false;
 let waConnected    = false;
 let allResults     = [];
 let selectedIds    = new Set();
 let customMessages = {};
-let activeTab         = "wa";
-let currentNav        = "all-3days";
-let pendingSendIds    = [];
-let editingId         = null;
-let searchQuery       = "";
+let activeTab      = "wa";
+let currentNav     = "all-3days";
+let pendingSendIds = [];
+let editingId      = null;
+let searchQuery    = "";
 
 let smsLog = [];
 try { smsLog = JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); } catch(e){ smsLog = []; }
@@ -705,7 +706,7 @@ function toast(msg, type="ok"){
   el.className = "toast-card " + type;
   el.innerText = msg;
   $("toastBox").appendChild(el);
-  setTimeout(() => el.remove(), 2600);
+  setTimeout(() => el.remove(), 2800);
 }
 
 function copyText(txt, label="Copied!"){
@@ -994,29 +995,6 @@ $("mainSendBtn").addEventListener("click", () => {
   openConfirmSend(Array.from(selectedIds));
 });
 
-$("confirmSendBtn").addEventListener("click", async () => {
-  if (!pendingSendIds.length) return;
-  const ids = pendingSendIds.slice();
-  if (ids.length === 1) customMessages[ids[0]] = $("confirmMessage").value;
-  closeModal("confirmModal");
-
-  ids.forEach(id => {
-    const u = allResults.find(x => x.idname === id);
-    if (u) addSmsLog(u, customMessages[id] || u.message || "", "whatsapp");
-  });
-
-  try {
-    await fetch(API_BASE + "/api/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids, custom_messages: customMessages })
-    });
-    toast(`Dispatching ${ids.length} reminder(s)...`);
-  } catch(e) {
-    toast("Failed to dispatch.", "err");
-  }
-});
-
 /* LOGS */
 function addSmsLog(user, message, channel){
   smsLog.unshift({
@@ -1062,6 +1040,18 @@ $("clearLogBtn").addEventListener("click", () => {
   }
 });
 
+$("exportLogBtn").addEventListener("click", () => {
+  if (!smsLog.length) return toast("No logs to export", "err");
+  const rows = [["Name", "ID", "Phone", "Time", "Message"]];
+  smsLog.forEach(l => rows.push([l.name, l.idname, l.phone, l.time, (l.message||"").replace(/\n/g, " ")]));
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "sms_log.csv";
+  a.click();
+});
+
 /* SEARCH & TABS */
 $("filterInput").addEventListener("input", e => {
   searchQuery = e.target.value.trim();
@@ -1080,135 +1070,147 @@ document.querySelectorAll(".tab-pill").forEach(btn => {
 $("mobileToggle").addEventListener("click", () => document.body.classList.toggle("sidebar-open"));
 $("sbOverlay").addEventListener("click", () => document.body.classList.remove("sidebar-open"));
 
-/* SMART AUTO-CONNECT WITH DEFAULT CLOUDFLARE TUNNEL */
-async function checkEndpoint(url){
+/* =====================================================================
+   GITHUB ACTIONS API INTEGRATION
+   ===================================================================== */
+async function triggerGitHubAction(actionType, payloadObj = {}) {
+  if (!ghToken) {
+    const input = prompt("GitHub Personal Access Token (PAT) দিন (একবার দিলেই ব্রাউজারে সেভ থাকবে):");
+    if (!input) return false;
+    ghToken = input.trim();
+    localStorage.setItem("mhpi_gh_token", ghToken);
+  }
+
   try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 2500);
-    const res = await fetch(url + "/api/state", { signal: ctrl.signal });
-    clearTimeout(timer);
-    if (res.ok) return true;
-  } catch(e){}
-  return false;
+    const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/dispatches`, {
+      method: "POST",
+      headers: {
+        "Accept": "application/vnd.github+json",
+        "Authorization": `Bearer ${ghToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ref: GH_BRANCH,
+        inputs: {
+          action: actionType,
+          payload: JSON.stringify(payloadObj)
+        }
+      })
+    });
+
+    if (res.status === 204) {
+      return true;
+    } else {
+      toast("GitHub Token সঠিক নয় বা Workflow পারমিশন নেই!", "err");
+      return false;
+    }
+  } catch (e) {
+    toast("GitHub API কানেকশন ব্যর্থ হয়েছে!", "err");
+    return false;
+  }
 }
 
-async function syncTunnelUrl(){
-  // 1. Check Default Cloudflare Tunnel First
-  if (await checkEndpoint(DEFAULT_TUNNEL)) {
-    API_BASE = DEFAULT_TUNNEL;
-    return;
-  }
-
-  // 2. Check custom saved URL if any
-  const saved = localStorage.getItem("mhpi_custom_api");
-  if (saved && await checkEndpoint(saved)) {
-    API_BASE = saved;
-    return;
-  }
-
-  // 3. Check local Termux server (127.0.0.1:5001)
-  if (await checkEndpoint(LOCAL_API)) {
-    API_BASE = LOCAL_API;
-    return;
-  }
-
-  // 4. Fallback to ntfy.sh if tunnel URL changed
+async function pollState() {
   try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 3000);
-    const res = await fetch("https://ntfy.sh/" + SYNC_CHANNEL + "/json?poll=1&since=48h", { signal: ctrl.signal });
-    clearTimeout(timer);
-    const text = await res.text();
-    const lines = text.trim().split("\n").filter(Boolean);
-    for (let i = lines.length - 1; i >= 0; i--) {
-      let obj; try { obj = JSON.parse(lines[i]); } catch(e){ continue; }
-      if (obj.event === "message" && typeof obj.message === "string") {
-        const msg = obj.message.trim();
-        if (msg.startsWith("http")) {
-          API_BASE = msg.replace(/\/+$/, "");
-          break;
+    // ১. GitHub Action বর্তমানে রানিং আছে কিনা চেক করা
+    if (ghToken) {
+      const runRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/actions/runs?per_page=1`, {
+        headers: { "Authorization": `Bearer ${ghToken}` }
+      });
+      if (runRes.ok) {
+        const runData = await runRes.json();
+        const latestRun = runData.workflow_runs && runData.workflow_runs[0];
+        if (latestRun && (latestRun.status === "in_progress" || latestRun.status === "queued")) {
+          $("scanProgressBox").classList.add("show");
+          $("scanBar").style.width = "65%";
+          $("scanPctText").innerText = "Running";
+          $("scanStatusText").innerText = "GitHub Action কাজ করছে...";
+          $("sideScanBtn").disabled = true;
+        } else {
+          $("scanProgressBox").classList.remove("show");
+          $("sideScanBtn").disabled = false;
         }
       }
     }
-  } catch(e){}
-}
 
-async function pollState(){
-  if (!API_BASE) {
-    API_BASE = DEFAULT_TUNNEL;
-  }
-  try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 3500);
-    const res = await fetch(API_BASE + "/api/state", { signal: ctrl.signal });
-    clearTimeout(timer);
+    // ২. রিপোজিটরি থেকে সর্বশেষ state.json পড়া
+    const stateUrl = ghToken
+      ? `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/state.json?ref=${GH_BRANCH}&t=${Date.now()}`
+      : `./state.json?t=${Date.now()}`;
+
+    const headers = ghToken
+      ? { "Authorization": `Bearer ${ghToken}`, "Accept": "application/vnd.github.v3.raw" }
+      : {};
+
+    const res = await fetch(stateUrl, { headers, cache: "no-store" });
+    if (!res.ok) throw new Error("state.json not created yet");
     const data = await res.json();
 
     serverOnline = true;
     waConnected = !!data.wa_connected;
     $("statusPill").className = "hdr-status " + (waConnected ? "online" : "warn");
-    $("statusPill").innerHTML = waConnected ? '<i class="fab fa-whatsapp"></i>' : '<i class="fas fa-triangle-exclamation"></i>';
-    $("opStatusText").innerText = waConnected ? "WhatsApp Connected" : "WA Disconnected";
-    $("opSubText").innerText = data.scan_status || "Bridge Active";
+    $("statusPill").innerHTML = '<i class="fab fa-whatsapp"></i>';
+    $("opStatusText").innerText = waConnected ? "GitHub WA Ready" : "Cloud Active";
+    $("opSubText").innerText = data.scan_status || "Ready";
 
     if (data.last_scan_time) $("stripLastScan").innerText = "Last Scan: " + data.last_scan_time;
-
-    if (data.scanning) {
-      $("scanProgressBox").classList.add("show");
-      const pct = data.scan_total > 0 ? Math.round((data.scan_progress / data.scan_total) * 100) : 0;
-      $("scanBar").style.width = pct + "%";
-      $("scanPctText").innerText = pct + "%";
-      $("scanStatusText").innerText = data.scan_status || "Scanning...";
-      $("sideScanBtn").disabled = true;
-    } else {
-      $("scanProgressBox").classList.remove("show");
-      $("sideScanBtn").disabled = false;
-    }
 
     if (Array.isArray(data.results)) {
       allResults = data.results;
       renderStats();
       renderTable();
     }
-  } catch(e){
-    serverOnline = false; waConnected = false;
-    $("statusPill").className = "hdr-status offline";
-    $("statusPill").innerHTML = '<i class="fab fa-whatsapp"></i>';
-    $("opStatusText").innerText = "Bridge Offline";
-    $("opSubText").innerText = "Click WA icon to reconnect";
+  } catch (e) {
+    $("statusPill").className = "hdr-status " + (ghToken ? "warn" : "offline");
+    $("opStatusText").innerText = ghToken ? "Ready for First Scan" : "Token Not Set";
+    $("opSubText").innerText = ghToken ? "Click Scan Customers" : "Click WA icon to set Token";
   }
 }
 
-/* WHATSAPP ON BUTTON: Pre-filled with https://behavioral-copy-article-corp.trycloudflare.com */
+$("confirmSendBtn").addEventListener("click", async () => {
+  if (!pendingSendIds.length) return;
+  const ids = pendingSendIds.slice();
+  if (ids.length === 1) customMessages[ids[0]] = $("confirmMessage").value;
+  closeModal("confirmModal");
+
+  toast(`GitHub Action-এ ${ids.length}টি মেসেজ পাঠানোর নির্দেশ দেওয়া হচ্ছে...`, "info");
+  const ok = await triggerGitHubAction("send", { ids, custom_messages: customMessages });
+  if (ok) {
+    ids.forEach(id => {
+      const u = allResults.find(x => x.idname === id);
+      if (u) addSmsLog(u, customMessages[id] || u.message || "", "whatsapp");
+    });
+    toast("মেসেজ পাঠানো শুরু হয়েছে! ৩০-৪০ সেকেন্ডের মধ্যে চলে যাবে।");
+    setTimeout(pollState, 4000);
+  }
+});
+
 $("statusPill").addEventListener("click", async () => {
-  const manual = prompt(
-    "WhatsApp Bridge Active URL (Default set to your Cloudflare Tunnel):",
-    API_BASE || DEFAULT_TUNNEL
-  );
+  const manual = prompt("আপনার GitHub Personal Access Token (PAT) দিন:", ghToken);
   if (manual !== null) {
-    const clean = manual.trim().replace(/\/+$/, "") || DEFAULT_TUNNEL;
-    localStorage.setItem("mhpi_custom_api", clean);
-    API_BASE = clean;
-    toast("Connecting to: " + API_BASE, "info");
+    ghToken = manual.trim();
+    localStorage.setItem("mhpi_gh_token", ghToken);
+    toast("GitHub Token সেভ হয়েছে!", "info");
     await pollState();
   }
 });
 
 $("sideScanBtn").addEventListener("click", async () => {
-  if (!serverOnline) {
-    API_BASE = localStorage.getItem("mhpi_custom_api") || DEFAULT_TUNNEL;
-    await pollState();
-  }
-  if (!serverOnline) return toast("Server bridge offline! Check Termux.", "err");
   $("sideScanBtn").disabled = true;
-  try {
-    await fetch(API_BASE + "/api/scan?force=0", { method: "POST" });
-    toast("Scanning started.");
-  } catch(e){ toast("Scan failed.", "err"); }
+  const ok = await triggerGitHubAction("scan");
+  if (ok) {
+    toast("GitHub Action স্ক্যান শুরু করেছে! ১ মিনিটের মধ্যে তালিকা আপডেট হবে।");
+    $("scanProgressBox").classList.add("show");
+    $("scanBar").style.width = "30%";
+    $("scanPctText").innerText = "Starting";
+    $("scanStatusText").innerText = "GitHub Action চালু হচ্ছে...";
+    setTimeout(pollState, 5000);
+  } else {
+    $("sideScanBtn").disabled = false;
+  }
 });
 
 $("refreshBtn").addEventListener("click", async () => {
-  await syncTunnelUrl();
   await pollState();
   toast("Refreshed.");
 });
@@ -1217,8 +1219,7 @@ $("refreshBtn").addEventListener("click", async () => {
   renderStats();
   renderTable();
   await pollState();
-  setInterval(syncTunnelUrl, 8000);
-  setInterval(pollState, 1500);
+  setInterval(pollState, 10000);
 })();
 </script>
 </body>
