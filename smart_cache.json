@@ -3769,6 +3769,115 @@
       "checked_date": "2026-09-28"
     }
   },
-  "wa_numbers": {},
+  "wa_numbers": {
+    "8801859797780": {
+      "exists": false,
+      "jid": null
+    },
+    "8801813991067": {
+      "exists": false,
+      "jid": null
+    },
+    "8801883086821": {
+      "exists": false,
+      "jid": null
+    },
+    "8801955030003": {
+      "exists": true,
+      "jid": "8801955030003@s.whatsapp.net"
+    },
+    "8801301374989": {
+      "exists": true,
+      "jid": "8801301374989@s.whatsapp.net"
+    },
+    "8801303468805": {
+      "exists": true,
+      "jid": "8801303468805@s.whatsapp.net"
+    },
+    "8801330533281": {
+      "exists": false,
+      "jid": null
+    },
+    "8801781645276": {
+      "exists": true,
+      "jid": "8801781645276@s.whatsapp.net"
+    },
+    "8801706743503": {
+      "exists": false,
+      "jid": null
+    },
+    "8801951267871": {
+      "exists": false,
+      "jid": null
+    },
+    "8801721217630": {
+      "exists": true,
+      "jid": "8801721217630@s.whatsapp.net"
+    },
+    "8801748182758": {
+      "exists": false,
+      "jid": null
+    },
+    "8801760104804": {
+      "exists": true,
+      "jid": "8801760104804@s.whatsapp.net"
+    },
+    "8801724954312": {
+      "exists": false,
+      "jid": null
+    },
+    "8801749567519": {
+      "exists": false,
+      "jid": null
+    },
+    "8801886448356": {
+      "exists": true,
+      "jid": "8801886448356@s.whatsapp.net"
+    },
+    "8801771040247": {
+      "exists": true,
+      "jid": "8801771040247@s.whatsapp.net"
+    },
+    "8801925383254": {
+      "exists": false,
+      "jid": null
+    },
+    "8801746824599": {
+      "exists": false,
+      "jid": null
+    },
+    "8801810775958": {
+      "exists": false,
+      "jid": null
+    },
+    "8801749478672": {
+      "exists": true,
+      "jid": "8801749478672@s.whatsapp.net"
+    },
+    "8801915936398": {
+      "exists": false,
+      "jid": null
+    },
+    "8801918148270": {
+      "exists": false,
+      "jid": null
+    },
+    "8801937075166": {
+      "exists": true,
+      "jid": "8801937075166@s.whatsapp.net"
+    },
+    "8801949137095": {
+      "exists": true,
+      "jid": "8801949137095@s.whatsapp.net"
+    },
+    "8801331512165": {
+      "exists": true,
+      "jid": "8801331512165@s.whatsapp.net"
+    },
+    "8801406042717": {
+      "exists": true,
+      "jid": "8801406042717@s.whatsapp.net"
+    }
+  },
   "sent_log": {}
 }
